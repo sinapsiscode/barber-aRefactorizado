@@ -1,36 +1,38 @@
+import { URLS } from '../../constants';
+
+const COUNTRY_NAMES = {
+  PE: 'Perú',
+  CO: 'Colombia',
+  CL: 'Chile',
+  AR: 'Argentina',
+  EC: 'Ecuador',
+  BO: 'Bolivia',
+  VE: 'Venezuela',
+  UY: 'Uruguay',
+  PY: 'Paraguay',
+  BR: 'Brasil',
+  MX: 'México',
+  US: 'Estados Unidos',
+  ES: 'España'
+};
+
 const CountryFlag = ({ country, countryCode, size = 16, showName = false }) => {
   // Permitir tanto 'country' como 'countryCode' como props
   const code = country || countryCode;
-  
+
   // Si no hay código, no renderizar nada
   if (!code) {
     return null;
   }
-  
-  const countryNames = {
-    PE: 'Perú',
-    CO: 'Colombia', 
-    CL: 'Chile',
-    AR: 'Argentina',
-    EC: 'Ecuador',
-    BO: 'Bolivia',
-    VE: 'Venezuela',
-    UY: 'Uruguay',
-    PY: 'Paraguay',
-    BR: 'Brasil',
-    MX: 'México',
-    US: 'Estados Unidos',
-    ES: 'España'
-  };
 
-  // Usar SVG desde CDN flagcdn.com (gratuito y confiable)
-  const flagUrl = `https://flagcdn.com/w20/${code.toLowerCase()}.png`;
+  // Usar URL centralizada desde constants
+  const flagUrl = `${URLS.FLAG_API}${code.toLowerCase()}.png`;
 
   return (
     <span className="inline-flex items-center space-x-1">
       <img 
         src={flagUrl}
-        alt={`${countryNames[code] || code} flag`}
+        alt={`${COUNTRY_NAMES[code] || code} flag`}
         width={size}
         height={size * 0.75} // Proporción típica de banderas
         className="rounded-sm object-cover"
@@ -41,7 +43,7 @@ const CountryFlag = ({ country, countryCode, size = 16, showName = false }) => {
         }}
       />
       <span className="hidden"></span> {/* Para el fallback */}
-      {showName && <span>{countryNames[code] || code}</span>}
+      {showName && <span>{COUNTRY_NAMES[code] || code}</span>}
     </span>
   );
 };

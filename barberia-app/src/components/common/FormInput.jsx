@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FORM_STYLES, cn } from '../../styles/components';
 
 const FormInput = ({
   label,
@@ -22,14 +23,15 @@ const FormInput = ({
   return (
     <div className={className}>
       {label && (
-        <label 
-          htmlFor={name} 
-          className={`block text-sm font-normal mb-1 transition-all duration-200 ${
-            isFocused ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'
-          }`}
+        <label
+          htmlFor={name}
+          className={cn(
+            FORM_STYLES.label.base,
+            isFocused && FORM_STYLES.label.focused,
+            required && FORM_STYLES.label.required
+          )}
         >
           {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
       <div className="relative group">
@@ -49,22 +51,12 @@ const FormInput = ({
           placeholder={placeholder}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className={`
-            w-full px-4 py-4
-            bg-gray-50 dark:bg-gray-900
-            border rounded
-            ${Icon ? 'pl-10' : ''} 
-            ${isPassword ? 'pr-10' : ''} 
-            ${error 
-              ? 'border-red-500 focus:border-red-500' 
-              : 'border-gray-300 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400'
-            }
-            text-gray-900 dark:text-gray-100
-            placeholder-gray-500 dark:placeholder-gray-400
-            text-base
-            focus:outline-none focus:bg-white dark:focus:bg-gray-800
-            transition-all duration-200
-          `}
+          className={cn(
+            FORM_STYLES.input.base,
+            error && FORM_STYLES.input.error,
+            Icon && FORM_STYLES.input.withIcon,
+            isPassword && FORM_STYLES.input.withPassword
+          )}
           {...props}
         />
         {isPassword && (
@@ -82,7 +74,7 @@ const FormInput = ({
         )}
       </div>
       {error && (
-        <p className="mt-1 text-sm text-red-500 dark:text-red-400">
+        <p className={FORM_STYLES.error}>
           {error}
         </p>
       )}

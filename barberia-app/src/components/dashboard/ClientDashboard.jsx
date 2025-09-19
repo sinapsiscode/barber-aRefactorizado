@@ -1,64 +1,40 @@
-import { useState, useEffect } from 'react';
-import { FiCalendar, FiUser, FiStar, FiGift, FiClock, FiPlus, FiMapPin, FiBell, FiSettings } from 'react-icons/fi';
-import { useAuthStore, useAppointmentStore, useClientStore, useStaffStore, useBranchStore } from '../../stores';
-import { MetricCard, BranchStatus } from '../common';
+// ===================================================================
+// 🧑‍💼 DASHBOARD DE CLIENTE - REFACTORIZADO
+// ===================================================================
+// Dashboard principal para el rol de cliente
+import React from 'react';
+import { FiClock, FiPlus, FiMapPin, FiUser, FiGift } from 'react-icons/fi';
+import { BranchStatus } from '../common';
 import ClientAppointmentForm from '../clients/ClientAppointmentForm';
 import ClientProfile from '../clients/ClientProfile';
+import { useClientDashboard } from '../../hooks';
+import {
+  ClientRewards,
+  ClientHistory,
+  ClientPreferences,
+  ClientProgress,
+  ClientWarningSettings,
+  ClientBranchInfo
+} from './components';
 
 const ClientDashboard = () => {
-  const { user } = useAuthStore();
-  const { appointments, getAppointmentsByClient } = useAppointmentStore();
-  const { getCurrentClientData, calculateLoyaltyTier, updateClientWarningSettings } = useClientStore();
-  const { barbers } = useStaffStore();
-  const { branches } = useBranchStore();
-  
-  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
-
-  // Obtener datos del cliente actual
-  const currentClient = getCurrentClientData(user);
-  
-  const [warningSettings, setWarningSettings] = useState({
-    enabled: currentClient?.warningEnabled !== false,
-    interval: currentClient?.cutoffWarningInterval || 15
-  });
-
-  const clientAppointments = currentClient ? getAppointmentsByClient(currentClient.id) : [];
-  const upcomingAppointments = clientAppointments.filter(apt => 
-    new Date(apt.date) >= new Date() && apt.status !== 'cancelled'
-  );
-  const nextAppointment = upcomingAppointments[0];
-
-  const preferredBarber = barbers.find(b => b.id === currentClient?.preferredBarber) || barbers[0];
-  const preferredBranch = branches.find(b => b.id === currentClient?.preferredBranch);
-  const tier = currentClient ? calculateLoyaltyTier(currentClient) : 'Bronze';
-
-  const recentHistory = clientAppointments
-    .filter(apt => apt.status === 'completed')
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 5);
-
-  const availableRewards = [
-    { points: 100, reward: 'Descuento 10%', description: 'En cualquier servicio' },
-    { points: 200, reward: 'Servicio Gratis', description: 'Corte básico' },
-    { points: 300, reward: 'Descuento 25%', description: 'Combo completo' }
-  ];
-
-  const handleWarningSettingsChange = (field, value) => {
-    setWarningSettings(prev => ({ ...prev, [field]: value }));
-    if (currentClient) {
-      updateClientWarningSettings(currentClient.id, 
-        field === 'interval' ? value : warningSettings.interval,
-        field === 'enabled' ? value : warningSettings.enabled
-      );
-    }
-  };
-
-  const getDaysSinceLastVisit = () => {
-    if (!currentClient?.lastVisit) return 'Nunca';
-    const days = Math.floor((new Date() - new Date(currentClient.lastVisit)) / (1000 * 60 * 60 * 24));
-    return `${days} días`;
-  };
+  const {
+    currentClient,
+    showAppointmentForm,
+    showProfile,
+    warningSettings,
+    nextAppointment,
+    preferredBarber,
+    preferredBranch,
+    tier,
+    recentHistory,
+    availableRewards,
+    setShowAppointmentForm,
+    setShowProfile,
+    handleWarningSettingsChange,
+    getDaysSinceLastVisit,
+    getNextWarningDays
+  } = useClientDashboard();
 
   // Mostrar mensaje si no hay datos del cliente
   if (!currentClient) {
@@ -199,274 +175,39 @@ const ClientDashboard = () => {
 
       {/* Status Overview - Información consolidada */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Mi Progreso */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-              <FiStar className="h-5 w-5 text-primary-500 mr-2" />
-              Mi Progreso
-            </h3>
-            <span className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-3 py-1 rounded-full text-sm font-medium">
-              {tier}
-            </span>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-gray-50 dark:bg-dark-700 rounded-lg">
-              <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">{currentClient.loyaltyPoints}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Puntos</div>
-            </div>
-            <div className="text-center p-3 bg-gray-50 dark:bg-dark-700 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">{currentClient.totalVisits}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Visitas</div>
-            </div>
-          </div>
+        <ClientProgress
+          loyaltyPoints={currentClient.loyaltyPoints}
+          totalVisits={currentClient.totalVisits}
+          tier={tier}
+        />
 
-          {/* Próxima recompensa disponible */}
-          {currentClient.loyaltyPoints >= 100 && (
-            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center space-x-2">
-                <FiGift className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                  ¡Tienes descuentos disponibles!
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Mi Barbero y Sucursal */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center mb-4">
-            <FiUser className="h-5 w-5 text-green-500 mr-2" />
-            Mis Preferencias
-          </h3>
-          
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-dark-700 rounded-lg">
-              <div className="h-10 w-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                <FiUser className="h-5 w-5 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <div className="font-medium text-gray-900 dark:text-white">
-                  {preferredBarber?.name || 'Sin barbero preferido'}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {preferredBarber?.specialties?.[0] || 'Selecciona tu barbero favorito'}
-                </div>
-              </div>
-            </div>
-
-            {preferredBranch && (
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-dark-700 rounded-lg">
-                <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                  <FiMapPin className="h-5 w-5 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900 dark:text-white">
-                    {preferredBranch.name}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {preferredBranch.city}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <ClientPreferences
+          preferredBarber={preferredBarber}
+          preferredBranch={preferredBranch}
+        />
       </div>
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent History */}
-        <div className="lg:col-span-2 card">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Historial Reciente
-            </h3>
-            <FiClock className="h-5 w-5 text-gray-400" />
-          </div>
-          
-          {recentHistory.length > 0 ? (
-            <div className="space-y-4">
-              {recentHistory.map((appointment) => (
-                <div key={appointment.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-dark-700 rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className="h-12 w-12 bg-primary-100 rounded-full flex items-center justify-center">
-                      <FiCalendar className="h-6 w-6 text-primary-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-white">
-                        {appointment.services?.map(s => s).join(', ') || 'Servicio'}
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {new Date(appointment.date).toLocaleDateString()} • {appointment.barberName}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-green-600">
-                      S/{appointment.totalPrice?.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      +{Math.floor(appointment.totalPrice / 25)} pts
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              <FiClock className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>No hay historial de citas</p>
-            </div>
-          )}
+        <div className="lg:col-span-2">
+          <ClientHistory recentHistory={recentHistory} />
         </div>
 
-        {/* Rewards & Info */}
         <div className="space-y-6">
-          {/* Available Rewards */}
-          <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Recompensas Disponibles
-            </h3>
-            <div className="space-y-3">
-              {availableRewards.map((reward, index) => (
-                <div
-                  key={index}
-                  className={`p-3 rounded-lg border ${
-                    currentClient.loyaltyPoints >= reward.points
-                      ? 'border-green-200 bg-green-50 dark:bg-green-900'
-                      : 'border-gray-200 bg-gray-50 dark:bg-dark-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-white">
-                        {reward.reward}
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {reward.description}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className={`text-sm font-semibold ${
-                        currentClient.loyaltyPoints >= reward.points
-                          ? 'text-green-600'
-                          : 'text-gray-500'
-                      }`}>
-                        {reward.points} pts
-                      </div>
-                      {currentClient.loyaltyPoints >= reward.points && (
-                        <button className="text-xs bg-green-600 text-white px-2 py-1 rounded mt-1">
-                          Canjear
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ClientRewards
+            availableRewards={availableRewards}
+            loyaltyPoints={currentClient.loyaltyPoints}
+          />
 
-          {/* Warning Configuration */}
-          <div className="card">
-            <div className="flex items-center space-x-2 mb-4">
-              <FiBell className="h-5 w-5 text-yellow-500" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Configuración de Avisos
-              </h3>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Recibir notificaciones
-                </span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={warningSettings.enabled}
-                    onChange={(e) => handleWarningSettingsChange('enabled', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 dark:peer-focus:ring-yellow-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-yellow-500"></div>
-                </label>
-              </div>
+          <ClientWarningSettings
+            warningSettings={warningSettings}
+            onSettingsChange={handleWarningSettingsChange}
+            getDaysSinceLastVisit={getDaysSinceLastVisit}
+            getNextWarningDays={getNextWarningDays}
+            lastWarningDate={currentClient.lastWarningDate}
+          />
 
-              {warningSettings.enabled && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Frecuencia de Avisos
-                    </label>
-                    <select
-                      value={warningSettings.interval}
-                      onChange={(e) => handleWarningSettingsChange('interval', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 dark:bg-dark-700 dark:border-dark-600 dark:text-white"
-                    >
-                      <option value={7}>Cada 7 días</option>
-                      <option value={10}>Cada 10 días</option>
-                      <option value={15}>Cada 15 días</option>
-                      <option value={20}>Cada 20 días</option>
-                      <option value={30}>Cada 30 días</option>
-                    </select>
-                  </div>
-
-                  <div className="bg-yellow-50 dark:bg-yellow-900 p-3 rounded-lg">
-                    <div className="flex items-start space-x-2">
-                      <FiSettings className="h-4 w-4 text-yellow-600 mt-0.5" />
-                      <div className="text-sm text-yellow-800 dark:text-yellow-200">
-                        <p className="font-medium mb-1">Estado:</p>
-                        <p>Última visita: <strong>{getDaysSinceLastVisit()}</strong></p>
-                        <p>Próximo aviso en: <strong>
-                          {currentClient.lastVisit 
-                            ? Math.max(0, warningSettings.interval - Math.floor((new Date() - new Date(currentClient.lastVisit)) / (1000 * 60 * 60 * 24)))
-                            : warningSettings.interval
-                          } días
-                        </strong></p>
-                        {currentClient.lastWarningDate && (
-                          <p>Último aviso: <strong>{new Date(currentClient.lastWarningDate).toLocaleDateString()}</strong></p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {!warningSettings.enabled && (
-                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    No recibirás recordatorios automáticos
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Branch Info */}
-          {preferredBranch && (
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Mi Sede Preferida
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <FiMapPin className="h-5 w-5 text-primary-500" />
-                  <div>
-                    <div className="font-medium">{preferredBranch.name}</div>
-                    <div className="text-sm text-gray-600">{preferredBranch.address}</div>
-                  </div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  <strong>Horarios:</strong><br />
-                  Lun-Vie: 8:00 AM - 8:00 PM<br />
-                  Sáb: 8:00 AM - 6:00 PM<br />
-                  Dom: 9:00 AM - 5:00 PM
-                </div>
-              </div>
-            </div>
-          )}
+          <ClientBranchInfo preferredBranch={preferredBranch} />
         </div>
       </div>
 

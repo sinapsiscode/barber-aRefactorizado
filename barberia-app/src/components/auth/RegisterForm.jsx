@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { FiUser, FiMail, FiLock, FiPhone, FiEye, FiEyeOff, FiScissors, FiCheck, FiArrowLeft } from 'react-icons/fi';
-import { useAuthStore } from '../../stores';
-import TermsAndConditions from './TermsAndConditions';
+import React, { useState } from 'react';
+import { FiScissors, FiCheck, FiArrowLeft } from 'react-icons/fi';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-
-const MySwal = withReactContent(Swal);
+import { useAuth } from '../../hooks/useAuth';
+import { AUTH_LABELS, AUTH_PLACEHOLDERS, AUTH_MESSAGES, SWEETALERT_CONFIG } from '../../constants/auth';
+import AuthInput from './AuthInput';
+import TermsAndConditions from './TermsAndConditions';
+import { Button } from '../common';
 
 const RegisterForm = ({ onBackToLogin }) => {
   const [formData, setFormData] = useState({
@@ -15,109 +15,26 @@ const RegisterForm = ({ onBackToLogin }) => {
     password: '',
     confirmPassword: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isFocused, setIsFocused] = useState({});
   const [showTerms, setShowTerms] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
-  
-  const { register } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { handleRegister, isLoading, errors, clearFieldError, showAlert } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validaciones
-    if (!formData.name || !formData.email || !formData.phone || !formData.password) {
-      MySwal.fire({
-        icon: 'warning',
-        title: 'Campos requeridos',
-        text: 'Por favor completa todos los campos',
-        confirmButtonColor: '#FFB800',
-        background: '#1A1A1A',
-        color: '#FFFFFF'
-      });
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      MySwal.fire({
-        icon: 'error',
-        title: 'Contraseñas no coinciden',
-        text: 'Las contraseñas ingresadas no son iguales',
-        confirmButtonColor: '#FFB800',
-        background: '#1A1A1A',
-        color: '#FFFFFF'
-      });
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      MySwal.fire({
-        icon: 'warning',
-        title: 'Contraseña muy corta',
-        text: 'La contraseña debe tener al menos 6 caracteres',
-        confirmButtonColor: '#FFB800',
-        background: '#1A1A1A',
-        color: '#FFFFFF'
-      });
-      return;
-    }
 
     if (!termsAccepted) {
-      MySwal.fire({
-        icon: 'warning',
-        title: 'Términos y Condiciones',
-        text: 'Debes aceptar los términos y condiciones para registrarte',
-        confirmButtonColor: '#FFB800',
-        background: '#1A1A1A',
-        color: '#FFFFFF'
-      });
+      await showAlert('warning', AUTH_MESSAGES.REGISTER.TERMS_REQUIRED, AUTH_MESSAGES.REGISTER.TERMS_REQUIRED_TEXT);
       return;
     }
 
-    setIsRegistering(true);
+    const registerData = { ...formData, termsAccepted };
+    const result = await handleRegister(registerData);
 
-    try {
-      // Simular registro (aquí iría la lógica real)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const newUser = {
-        id: Date.now(),
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        role: 'client',
-        permissions: ['read_own', 'read_portfolio', 'read_appointments', 'write_appointments'],
-        avatar: '',
-        termsAcceptedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString()
-      };
-
-      // Mostrar éxito
-      MySwal.fire({
-        icon: 'success',
-        title: '¡Registro Exitoso!',
-        text: `Bienvenido ${formData.name}. Tu cuenta ha sido creada correctamente.`,
-        confirmButtonText: 'Iniciar Sesión',
-        confirmButtonColor: '#FFB800',
-        background: '#1A1A1A',
-        color: '#FFFFFF'
-      }).then(() => {
-        onBackToLogin();
-      });
-
-    } catch (error) {
-      MySwal.fire({
-        icon: 'error',
-        title: 'Error en el registro',
-        text: 'Ocurrió un error al crear tu cuenta. Por favor intenta nuevamente.',
-        confirmButtonColor: '#FFB800',
-        background: '#1A1A1A',
-        color: '#FFFFFF'
-      });
-    } finally {
-      setIsRegistering(false);
+    if (result.success) {
+      onBackToLogin();
     }
   };
 
@@ -129,23 +46,17 @@ const RegisterForm = ({ onBackToLogin }) => {
   };
 
   const handleFocus = (field) => {
-    setIsFocused({ ...isFocused, [field]: true });
-  };
-
-  const handleBlur = (field) => {
-    setIsFocused({ ...isFocused, [field]: false });
+    clearFieldError(field);
   };
 
   const handleTermsAccept = () => {
     setTermsAccepted(true);
-    MySwal.fire({
+    Swal.fire({
       icon: 'success',
-      title: 'Términos Aceptados',
-      text: 'Has aceptado los términos y condiciones correctamente',
-      timer: 2000,
-      showConfirmButton: false,
-      background: '#1A1A1A',
-      color: '#FFFFFF'
+      title: AUTH_MESSAGES.REGISTER.TERMS_ACCEPTED,
+      text: AUTH_MESSAGES.REGISTER.TERMS_ACCEPTED_TEXT,
+      ...SWEETALERT_CONFIG.THEME,
+      ...SWEETALERT_CONFIG.SUCCESS
     });
   };
 
@@ -175,172 +86,79 @@ const RegisterForm = ({ onBackToLogin }) => {
               <div className="absolute -inset-2 bg-[#FFB800]/20 rounded-2xl blur-xl animate-pulse" />
             </div>
             <h2 className="text-3xl font-bold gradient-text mb-2">
-              CREAR CUENTA
+              {AUTH_LABELS.REGISTER.TITLE}
             </h2>
             <p className="text-[#B8B8B8] text-sm uppercase tracking-widest">
-              Únete a la experiencia premium
+              {AUTH_LABELS.REGISTER.SUBTITLE}
             </p>
           </div>
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             
-            {/* Name Field */}
-            <div>
-              <label className="block text-xs font-semibold text-[#B8B8B8] mb-2 uppercase tracking-wider">
-                Nombre Completo
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                  <FiUser className={`h-4 w-4 transition-colors duration-200 ${
-                    isFocused.name ? 'text-[#FFB800]' : 'text-[#808080]'
-                  }`} />
-                </div>
-                <input
-                  name="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('name')}
-                  onBlur={() => handleBlur('name')}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[#000000] border border-[#FFB800]/20 rounded-lg text-white placeholder-[#808080] text-sm transition-all duration-200 focus:border-[#FFB800] focus:shadow-[0_0_0_3px_rgba(255,184,0,0.1)] hover:border-[#FFB800]/30"
-                  placeholder="Tu nombre completo"
-                />
-                <div className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#FFB800] to-transparent transform transition-transform duration-300 ${
-                  isFocused.name ? 'scale-x-100' : 'scale-x-0'
-                }`} />
-              </div>
-            </div>
+            <AuthInput
+              name="name"
+              type="text"
+              label={AUTH_LABELS.REGISTER.NAME}
+              placeholder={AUTH_PLACEHOLDERS.NAME}
+              value={formData.name}
+              onChange={handleChange}
+              onFocus={() => handleFocus('name')}
+              error={errors.name}
+              icon="user"
+            />
 
-            {/* Email Field */}
-            <div>
-              <label className="block text-xs font-semibold text-[#B8B8B8] mb-2 uppercase tracking-wider">
-                Correo Electrónico
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                  <FiMail className={`h-4 w-4 transition-colors duration-200 ${
-                    isFocused.email ? 'text-[#FFB800]' : 'text-[#808080]'
-                  }`} />
-                </div>
-                <input
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('email')}
-                  onBlur={() => handleBlur('email')}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[#000000] border border-[#FFB800]/20 rounded-lg text-white placeholder-[#808080] text-sm transition-all duration-200 focus:border-[#FFB800] focus:shadow-[0_0_0_3px_rgba(255,184,0,0.1)] hover:border-[#FFB800]/30"
-                  placeholder="tu@email.com"
-                />
-                <div className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#FFB800] to-transparent transform transition-transform duration-300 ${
-                  isFocused.email ? 'scale-x-100' : 'scale-x-0'
-                }`} />
-              </div>
-            </div>
+            <AuthInput
+              name="email"
+              type="email"
+              label={AUTH_LABELS.REGISTER.EMAIL}
+              placeholder={AUTH_PLACEHOLDERS.EMAIL}
+              value={formData.email}
+              onChange={handleChange}
+              onFocus={() => handleFocus('email')}
+              error={errors.email}
+              icon="mail"
+            />
 
-            {/* Phone Field */}
-            <div>
-              <label className="block text-xs font-semibold text-[#B8B8B8] mb-2 uppercase tracking-wider">
-                Teléfono
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                  <FiPhone className={`h-4 w-4 transition-colors duration-200 ${
-                    isFocused.phone ? 'text-[#FFB800]' : 'text-[#808080]'
-                  }`} />
-                </div>
-                <input
-                  name="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('phone')}
-                  onBlur={() => handleBlur('phone')}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[#000000] border border-[#FFB800]/20 rounded-lg text-white placeholder-[#808080] text-sm transition-all duration-200 focus:border-[#FFB800] focus:shadow-[0_0_0_3px_rgba(255,184,0,0.1)] hover:border-[#FFB800]/30"
-                  placeholder="+51 999 888 777"
-                />
-                <div className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#FFB800] to-transparent transform transition-transform duration-300 ${
-                  isFocused.phone ? 'scale-x-100' : 'scale-x-0'
-                }`} />
-              </div>
-            </div>
+            <AuthInput
+              name="phone"
+              type="tel"
+              label={AUTH_LABELS.REGISTER.PHONE}
+              placeholder={AUTH_PLACEHOLDERS.PHONE}
+              value={formData.phone}
+              onChange={handleChange}
+              onFocus={() => handleFocus('phone')}
+              error={errors.phone}
+              icon="phone"
+            />
 
-            {/* Password Field */}
-            <div>
-              <label className="block text-xs font-semibold text-[#B8B8B8] mb-2 uppercase tracking-wider">
-                Contraseña
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                  <FiLock className={`h-4 w-4 transition-colors duration-200 ${
-                    isFocused.password ? 'text-[#FFB800]' : 'text-[#808080]'
-                  }`} />
-                </div>
-                <input
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('password')}
-                  onBlur={() => handleBlur('password')}
-                  className="w-full pl-10 pr-10 py-2.5 bg-[#000000] border border-[#FFB800]/20 rounded-lg text-white placeholder-[#808080] text-sm transition-all duration-200 focus:border-[#FFB800] focus:shadow-[0_0_0_3px_rgba(255,184,0,0.1)] hover:border-[#FFB800]/30"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <FiEyeOff className="h-4 w-4 text-[#808080] hover:text-[#FFB800] transition-colors" />
-                  ) : (
-                    <FiEye className="h-4 w-4 text-[#808080] hover:text-[#FFB800] transition-colors" />
-                  )}
-                </button>
-                <div className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#FFB800] to-transparent transform transition-transform duration-300 ${
-                  isFocused.password ? 'scale-x-100' : 'scale-x-0'
-                }`} />
-              </div>
-            </div>
+            <AuthInput
+              name="password"
+              type="password"
+              label={AUTH_LABELS.REGISTER.PASSWORD}
+              placeholder={AUTH_PLACEHOLDERS.PASSWORD}
+              value={formData.password}
+              onChange={handleChange}
+              onFocus={() => handleFocus('password')}
+              error={errors.password}
+              icon="lock"
+              showPassword={showPassword}
+              onTogglePassword={() => setShowPassword(!showPassword)}
+            />
 
-            {/* Confirm Password Field */}
-            <div>
-              <label className="block text-xs font-semibold text-[#B8B8B8] mb-2 uppercase tracking-wider">
-                Confirmar Contraseña
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                  <FiLock className={`h-4 w-4 transition-colors duration-200 ${
-                    isFocused.confirmPassword ? 'text-[#FFB800]' : 'text-[#808080]'
-                  }`} />
-                </div>
-                <input
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('confirmPassword')}
-                  onBlur={() => handleBlur('confirmPassword')}
-                  className="w-full pl-10 pr-10 py-2.5 bg-[#000000] border border-[#FFB800]/20 rounded-lg text-white placeholder-[#808080] text-sm transition-all duration-200 focus:border-[#FFB800] focus:shadow-[0_0_0_3px_rgba(255,184,0,0.1)] hover:border-[#FFB800]/30"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showConfirmPassword ? (
-                    <FiEyeOff className="h-4 w-4 text-[#808080] hover:text-[#FFB800] transition-colors" />
-                  ) : (
-                    <FiEye className="h-4 w-4 text-[#808080] hover:text-[#FFB800] transition-colors" />
-                  )}
-                </button>
-                <div className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#FFB800] to-transparent transform transition-transform duration-300 ${
-                  isFocused.confirmPassword ? 'scale-x-100' : 'scale-x-0'
-                }`} />
-              </div>
-            </div>
+            <AuthInput
+              name="confirmPassword"
+              type="password"
+              label={AUTH_LABELS.REGISTER.CONFIRM_PASSWORD}
+              placeholder={AUTH_PLACEHOLDERS.CONFIRM_PASSWORD}
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              onFocus={() => handleFocus('confirmPassword')}
+              error={errors.confirmPassword}
+              icon="lock"
+              showPassword={showConfirmPassword}
+              onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
+            />
 
             {/* Terms and Conditions */}
             <div className="pt-2">
@@ -373,34 +191,28 @@ const RegisterForm = ({ onBackToLogin }) => {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={isRegistering || !termsAccepted}
-              className="w-full relative overflow-hidden group py-3 bg-gradient-to-r from-[#FFB800] to-[#FFA500] text-black font-bold uppercase tracking-wider rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-[#FFB800]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm"
+              variant="primary"
+              size="lg"
+              className="w-full"
+              disabled={isLoading || !termsAccepted}
+              loading={isLoading}
+              loadingText={AUTH_LABELS.REGISTER.LOADING}
             >
-              <span className="relative z-10 flex items-center justify-center">
-                {isRegistering ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                    Creando Cuenta...
-                  </>
-                ) : (
-                  'Crear Cuenta'
-                )}
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#FFA500] to-[#FFB800] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
+              {AUTH_LABELS.REGISTER.SUBMIT}
+            </Button>
           </form>
 
           {/* Footer */}
           <div className="mt-6 text-center">
             <div className="flex items-center justify-center space-x-2 text-xs text-[#808080]">
-              <span>¿Ya tienes cuenta?</span>
+              <span>{AUTH_LABELS.REGISTER.HAVE_ACCOUNT}</span>
               <button
                 onClick={onBackToLogin}
                 className="text-[#FFB800] hover:text-[#FFA500] font-medium"
               >
-                Iniciar Sesión
+                {AUTH_LABELS.REGISTER.LOGIN_LINK}
               </button>
             </div>
           </div>

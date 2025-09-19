@@ -11,3 +11,13 @@ export { default as BranchStatus } from './BranchStatus';
 export { default as RoleBasedNotifications } from './RoleBasedNotifications';
 export { default as CountryFlag } from './CountryFlag';
 export { default as DemoModeControl } from './DemoModeControl';
+
+// Nuevos componentes refactorizados
+export { default as Button } from './Button';
+export { default as Card } from './Card';
+export { default as Badge } from './Badge';
+export { default as Tabs } from './Tabs';
+export { default as Avatar } from './Avatar';
+export { default as Alert } from './Alert';
+export { default as Modal } from './Modal';
+export { default as Select } from './Select';
