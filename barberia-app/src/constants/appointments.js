@@ -129,3 +129,116 @@ export const APPOINTMENT_TIME_SLOTS = {
   LUNCH_START: 13,
   LUNCH_END: 14
 };
+
+// ===================================================================
+// 💳 CONSTANTES PARA VERIFICACIÓN DE PAGOS - AÑADIDAS
+// ===================================================================
+
+export const PAYMENT_STATUS = {
+  PENDING_PAYMENT: 'pending_payment'
+};
+
+export const PAYMENT_VERIFICATION_LABELS = {
+  TITLE: 'Verificar Pago',
+  APPROVE: '✓ Aprobar Pago',
+  REJECT: '✗ Rechazar Pago',
+  CANCEL: 'Cancelar',
+  VERIFY_BUTTON: 'Verificar',
+  SECURITY_ALERT: '⚠️ ALERTA DE SEGURIDAD',
+  CLIENT_BLOCKED: 'Cliente BLOQUEADO por múltiples vouchers falsos',
+  FALSE_VOUCHERS_COUNT: 'Este cliente tiene {count} voucher(es) falso(s) registrado(s)',
+  LAST_REJECTION: 'Último rechazo: {date}',
+  CLIENT_LABEL: 'Cliente:',
+  DATE_LABEL: 'Fecha:',
+  TIME_LABEL: 'Hora:',
+  TOTAL_LABEL: 'Total:',
+  METHOD_LABEL: 'Método:',
+  OPERATION_LABEL: 'N° Operación:',
+  VOUCHER_LABEL: 'Comprobante:',
+  NO_VOUCHER: 'No se subió comprobante',
+  NO_OPERATION: 'No especificado',
+  APPROVED_TITLE: 'Pago Aprobado',
+  APPROVED_MESSAGE: 'La cita ha sido confirmada',
+  REJECTED_TITLE: 'Pago Rechazado',
+  REJECTED_MESSAGE: 'La cita ha sido cancelada',
+  CLIENT_BLACKLISTED: '⚠️ CLIENTE BLOQUEADO por múltiples intentos de fraude',
+  REJECTION_REASON_TITLE: 'Razón del rechazo',
+  REJECTION_REASON_PLACEHOLDER: 'Ingrese el motivo del rechazo...',
+  REJECTION_REASON_LABEL: 'Razón del rechazo'
+};
+
+export const FRAUD_DETECTION_KEYWORDS = [
+  'falso',
+  'fake',
+  'editado',
+  'no válido',
+  'no existe'
+];
+
+export const PAYMENT_VERIFICATION_COLORS = {
+  APPROVE: '#10b981',
+  REJECT: '#ef4444',
+  SUCCESS: '#ffc000'
+};
+
+export const APPOINTMENTS_PAGE_LABELS = {
+  TITLE: 'Gestión de Citas',
+  SUBTITLE: 'Administra las citas y horarios',
+  SUBTITLE_WITH_BRANCH: 'Administra las citas y horarios de {branch}',
+  NEW_APPOINTMENT: 'Nueva Cita',
+  CALENDAR: 'Calendario',
+  LIST: 'Lista',
+  SUCCESS_TITLE: 'Cita creada',
+  SUCCESS_MESSAGE: 'La cita se ha programado correctamente'
+};
+
+export const APPOINTMENTS_TABS = {
+  ALL: 'all',
+  PENDING_PAYMENT: 'pending_payment',
+  LABELS: {
+    ALL_APPOINTMENTS: 'Todas las citas',
+    PENDING_PAYMENTS: 'Pagos pendientes'
+  }
+};
+
+export const APPOINTMENTS_TABLE_COLUMNS = {
+  DATE: 'Fecha',
+  TIME: 'Hora',
+  CLIENT: 'Cliente',
+  BARBER: 'Barbero',
+  SERVICES: 'Servicios',
+  PRICE: 'Precio',
+  STATUS: 'Estado',
+  MULTIPLE_SERVICES: '{count} servicios',
+  SINGLE_SERVICE: 'Corte',
+  EMPTY_MESSAGE: 'No hay citas programadas'
+};
+
+export const APPOINTMENTS_STATS_LABELS = {
+  TOTAL: 'Total Citas',
+  TODAY: 'Citas Hoy',
+  CONFIRMED: 'Confirmadas',
+  COMPLETED: 'Completadas'
+};
+
+export const APPOINTMENTS_STYLES = {
+  TAB: {
+    ACTIVE: 'border-primary-500 text-primary-600 dark:text-primary-400',
+    INACTIVE: 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300',
+    PENDING_ACTIVE: 'border-orange-500 text-orange-600 dark:text-orange-400',
+    BASE: 'py-2 px-1 border-b-2 font-medium text-sm'
+  },
+  BUTTON: {
+    CALENDAR_ACTIVE: 'btn-secondary bg-primary-100',
+    CALENDAR_INACTIVE: 'btn-secondary',
+    PRIMARY: 'btn-primary',
+    VERIFY: 'text-xs px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 flex items-center space-x-1'
+  },
+  BADGE: {
+    COUNT: 'bg-orange-100 text-orange-800 text-xs font-medium px-2 py-0.5 rounded-full',
+    STATUS: 'px-2 py-1 text-xs font-medium rounded-full'
+  },
+  MODAL: {
+    PAYMENT_WIDTH: '600px'
+  }
+};

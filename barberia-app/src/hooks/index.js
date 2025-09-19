@@ -23,3 +23,5 @@ export { useDashboard } from './useDashboard';
 export { useReceptionDashboard } from './useReceptionDashboard';
 export { useBarberDashboard } from './useBarberDashboard';
 export { useBranchAdminDashboard } from './useBranchAdminDashboard';
+export { useBackgroundSettings } from './useBackgroundSettings';
+export { useStaffForm } from './useStaffForm';

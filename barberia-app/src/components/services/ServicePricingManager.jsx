@@ -361,23 +361,14 @@ const ServicePricingManager = () => {
         </div>
       </div>
 
-      {/* Información Adicional */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-        <div className="flex items-start">
-          <FiAlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-3 mt-0.5" />
-          <div>
-            <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-1">
-              Información Importante
-            </h4>
-            <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-              <li>• Los cambios de precios solo afectan a esta sede ({currentBranchName})</li>
-              <li>• Los clientes verán estos precios al seleccionar servicios</li>
-              <li>• Los precios se aplicarán inmediatamente después de guardar</li>
-              <li>• Puedes resetear a precios base en cualquier momento</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <ServicePricingTable
+        services={services}
+        getServicePriceData={getServicePriceData}
+        getFallbackImage={getFallbackImage}
+        onPriceChange={handlePriceChange}
+      />
+
+      <PricingInfoBox branchName={branchData.name} />
     </div>
   );
 };

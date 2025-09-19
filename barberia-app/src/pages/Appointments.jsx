@@ -1,10 +1,18 @@
-import { useState, useEffect } from 'react';
-import { FiCalendar, FiPlus, FiClock, FiUser, FiScissors, FiDollarSign, FiCheck, FiX, FiAlertTriangle, FiImage } from 'react-icons/fi';
-import { useAppointmentStore, useAuthStore, useBranchStore, useClientStore } from '../stores';
-import { DataTable, MetricCard, EmptyState } from '../components/common';
-import AppointmentCalendar from '../components/appointments/AppointmentCalendar';
+// ===================================================================
+// 📅 PÁGINA DE GESTIÓN DE CITAS - REFACTORIZADO
+// ===================================================================
+// Página principal para la administración de citas y verificación de pagos
+
+import React from 'react';
+import { useAppointmentsPage } from '../hooks/useAppointmentsPage';
+import { APPOINTMENTS_PAGE_LABELS } from '../constants/appointments';
+import {
+  AppointmentsHeader,
+  AppointmentsTabs,
+  AppointmentsStats,
+  AppointmentsContent
+} from './components';
 import AppointmentForm from '../components/appointments/AppointmentForm';
-import { getPaymentMethodName } from '../utils/paymentUtils';
 import Swal from 'sweetalert2';
 
 const Appointments = () => {
