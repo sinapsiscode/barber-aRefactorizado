@@ -194,3 +194,141 @@ export const CLIENT_MOCK_REWARDS = [
   { points: 200, reward: 'Servicio Gratis' },
   { points: 300, reward: 'Descuento 25%' }
 ];
+
+// ===================================================================
+// 👥 CONSTANTES PARA GESTIÓN DE CLIENTES - REFACTORIZADO
+// ===================================================================
+
+// Estados y configuración de tabs
+export const CLIENT_TABS = {
+  ALL: 'all',
+  FLAGGED: 'flagged'
+};
+
+// Textos de la interfaz principal
+export const CLIENT_MANAGEMENT_TEXTS = {
+  TITLE: 'Gestión de Clientes',
+  SUBTITLE: 'Administra clientes y programa de fidelización',
+  SUBTITLE_WITH_BRANCH: 'Administra clientes y programa de fidelización de',
+  NEW_CLIENT: 'Nuevo Cliente',
+  SEARCH_PLACEHOLDER: 'Buscar cliente...',
+  ALL_CLIENTS: 'Todos los clientes',
+  SUSPICIOUS_CLIENTS: 'Clientes sospechosos',
+  EMPTY_MESSAGE: 'No se encontraron clientes'
+};
+
+// Textos de métricas
+export const CLIENT_METRICS_TEXTS = {
+  TOTAL_CLIENTS: 'Clientes Totales',
+  NEW_THIS_MONTH: 'Nuevos Este Mes',
+  VIP_CLIENTS: 'Clientes VIP',
+  AVERAGE_SPENDING: 'Gasto Promedio',
+  PER_CLIENT: 'Por cliente'
+};
+
+// Textos de secciones
+export const CLIENT_SECTION_TEXTS = {
+  VIP_CLIENTS: 'Clientes VIP',
+  TIER_DISTRIBUTION: 'Distribución por Categoría',
+  GENERAL_STATS: 'Estadísticas Generales',
+  VISITS: 'visitas',
+  POINTS: 'pts'
+};
+
+// Textos de estadísticas
+export const CLIENT_STATS_TEXTS = {
+  AVERAGE_SPENDING: 'Gasto Promedio',
+  LOYALTY_POINTS: 'Puntos de Lealtad',
+  TOTAL_REVENUE: 'Ingresos Totales',
+  AVERAGE_PER_CLIENT: 'Promedio por Cliente'
+};
+
+// Configuración de niveles de cliente
+export const CLIENT_TIERS = {
+  PLATINUM: {
+    name: 'Platinum',
+    threshold: 1000000,
+    color: 'bg-purple-100 text-purple-800',
+    bgColor: 'bg-purple-500'
+  },
+  GOLD: {
+    name: 'Gold',
+    threshold: 500000,
+    color: 'bg-yellow-100 text-yellow-800',
+    bgColor: 'bg-yellow-500'
+  },
+  SILVER: {
+    name: 'Silver',
+    threshold: 200000,
+    color: 'bg-gray-100 text-gray-800',
+    bgColor: 'bg-gray-400'
+  },
+  BRONZE: {
+    name: 'Bronze',
+    threshold: 0,
+    color: 'bg-orange-100 text-orange-800',
+    bgColor: 'bg-orange-500'
+  }
+};
+
+// Configuración de colores para estados de cliente
+export const CLIENT_STATUS_COLORS = {
+  BLOCKED: 'bg-red-100 text-red-800',
+  FLAGGED: 'bg-red-500',
+  NORMAL: 'bg-primary-500'
+};
+
+// Textos de estado de cliente
+export const CLIENT_STATUS_TEXTS = {
+  BLOCKED: 'BLOQUEADO',
+  NEVER_VISITED: 'Nunca'
+};
+
+// Configuración de tabla de clientes
+export const CLIENT_TABLE_CONFIG = {
+  MAX_VIP_DISPLAY: 5,
+  COLUMNS: {
+    NAME: 'name',
+    PHONE: 'phone',
+    TOTAL_VISITS: 'totalVisits',
+    TOTAL_SPENT: 'totalSpent',
+    LOYALTY_POINTS: 'loyaltyPoints',
+    LAST_VISIT: 'lastVisit',
+    TIER: 'tier'
+  }
+};
+
+// Labels para columnas de tabla
+export const CLIENT_TABLE_LABELS = {
+  CLIENT: 'Cliente',
+  PHONE: 'Teléfono',
+  VISITS: 'Visitas',
+  TOTAL_SPENT: 'Total Gastado',
+  POINTS: 'Puntos',
+  LAST_VISIT: 'Última Visita',
+  CATEGORY: 'Categoría',
+  TIMES: 'veces'
+};
+
+// Configuración de alertas de seguridad
+export const CLIENT_SECURITY_CONFIG = {
+  FLAGS: {
+    IS_FLAGGED: 'isFlagged',
+    BLACKLISTED: 'blacklisted',
+    FALSE_VOUCHERS_COUNT: 'falseVouchersCount'
+  }
+};
+
+// Roles con acceso a funciones de seguridad
+export const CLIENT_SECURITY_ROLES = ['super_admin', 'branch_admin'];
+
+// Configuración de umbrales para estadísticas
+export const CLIENT_STATS_THRESHOLDS = {
+  HIGH_SPENDING: 100,
+  MEDIUM_SPENDING: 50,
+  COLORS: {
+    HIGH: 'text-green-600',
+    MEDIUM: 'text-yellow-600',
+    LOW: 'text-red-600'
+  }
+};

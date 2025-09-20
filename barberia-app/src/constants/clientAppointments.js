@@ -165,3 +165,137 @@ export const CLIENT_APPOINTMENT_STYLES = {
     DISABLED: 'bg-gray-200 text-gray-400 cursor-not-allowed'
   }
 };
+
+// ===================================================================
+// 📅 CONSTANTES PARA VISTA DE CITAS DEL CLIENTE - REFACTORIZADO
+// ===================================================================
+
+// Estados de las citas del cliente
+export const CLIENT_APPOINTMENT_STATUS = {
+  PENDING: 'pending',
+  PENDING_PAYMENT: 'pending_payment',
+  CONFIRMED: 'confirmed',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled'
+};
+
+// Textos de estado para cliente
+export const CLIENT_STATUS_TEXTS = {
+  [CLIENT_APPOINTMENT_STATUS.PENDING]: 'Pendiente',
+  [CLIENT_APPOINTMENT_STATUS.PENDING_PAYMENT]: 'Pago por verificar',
+  [CLIENT_APPOINTMENT_STATUS.CONFIRMED]: 'Confirmada',
+  [CLIENT_APPOINTMENT_STATUS.COMPLETED]: 'Completada',
+  [CLIENT_APPOINTMENT_STATUS.CANCELLED]: 'Cancelada'
+};
+
+// Colores de estado para cliente
+export const CLIENT_STATUS_COLORS = {
+  [CLIENT_APPOINTMENT_STATUS.PENDING]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  [CLIENT_APPOINTMENT_STATUS.PENDING_PAYMENT]: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+  [CLIENT_APPOINTMENT_STATUS.CONFIRMED]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  [CLIENT_APPOINTMENT_STATUS.COMPLETED]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  [CLIENT_APPOINTMENT_STATUS.CANCELLED]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+};
+
+// Colores de fondo para calendario de cliente
+export const CLIENT_CALENDAR_COLORS = {
+  [CLIENT_APPOINTMENT_STATUS.PENDING]: 'bg-yellow-500',
+  [CLIENT_APPOINTMENT_STATUS.PENDING_PAYMENT]: 'bg-orange-500',
+  [CLIENT_APPOINTMENT_STATUS.CONFIRMED]: 'bg-blue-500',
+  [CLIENT_APPOINTMENT_STATUS.COMPLETED]: 'bg-green-500',
+  [CLIENT_APPOINTMENT_STATUS.CANCELLED]: 'bg-red-500'
+};
+
+// Días de la semana
+export const WEEK_DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+// Modos de vista para cliente
+export const CLIENT_VIEW_MODES = {
+  LIST: 'list',
+  CALENDAR: 'calendar'
+};
+
+// Textos de la interfaz de cliente
+export const CLIENT_UI_TEXTS = {
+  TITLE: 'Mis Citas',
+  SUBTITLE: 'Gestiona tus reservas y historial',
+  CALENDAR_TITLE: 'Calendario de Citas',
+  UPCOMING_APPOINTMENTS: 'Próximas Citas',
+  APPOINTMENT_HISTORY: 'Historial de Citas',
+  APPOINTMENT_DETAILS: 'Detalles de la Cita',
+  NO_UPCOMING_APPOINTMENTS: 'No tienes citas programadas',
+  NO_UPCOMING_SUBTITLE: 'Reserva tu próxima cita para mantener tu estilo impecable',
+  ADD_APPOINTMENT: '+ Agregar cita',
+  COMPLETED_APPOINTMENTS: 'citas completadas',
+  NEW_BOOKING: 'Nueva Reserva',
+  BOOK_NOW: 'Reservar Ahora',
+  LIST_VIEW: 'Lista',
+  CALENDAR_VIEW: 'Calendario'
+};
+
+// Textos de métricas para cliente
+export const CLIENT_METRICS_TEXTS = {
+  UPCOMING: 'Próximas Citas',
+  COMPLETED: 'Citas Completadas',
+  TOTAL: 'Total de Citas'
+};
+
+// Textos de botones para cliente
+export const CLIENT_BUTTON_TEXTS = {
+  CANCEL: 'Cancelar',
+  CLOSE: 'Cerrar',
+  CANCEL_APPOINTMENT: 'Cancelar Cita',
+  CONFIRMED: '✓ Confirmada'
+};
+
+// Configuración de SweetAlert para cliente
+export const CLIENT_SWAL_CONFIG = {
+  CONFIRM_BUTTON_COLOR: '#ffc000',
+  CANCEL_BUTTON_COLOR: '#6b7280',
+  DANGER_BUTTON_COLOR: '#ef4444'
+};
+
+// Mensajes de SweetAlert para cliente
+export const CLIENT_SWAL_MESSAGES = {
+  CANCEL_APPOINTMENT: {
+    title: '¿Cancelar Cita?',
+    text: 'Esta acción no se puede deshacer',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, cancelar',
+    cancelButtonText: 'No, mantener'
+  },
+  APPOINTMENT_CANCELLED: {
+    icon: 'success',
+    title: 'Cita Cancelada',
+    text: 'Tu cita ha sido cancelada exitosamente'
+  },
+  INVALID_DATE: {
+    icon: 'warning',
+    title: 'Fecha no válida',
+    text: 'No puedes agendar citas en fechas pasadas'
+  }
+};
+
+// Textos para detalles de cita
+export const APPOINTMENT_DETAIL_TEXTS = {
+  SERVICES: 'Servicios',
+  DURATION: 'Duración',
+  PRICE: 'Precio',
+  LOCATION: 'Ubicación',
+  BARBER: 'Barbero',
+  NOTES: 'Notas',
+  MAIN_BRANCH: 'Sede Principal',
+  MINUTES: 'min',
+  POINTS: 'pts'
+};
+
+// Configuración por defecto para cliente
+export const CLIENT_DEFAULT_CONFIG = {
+  APPOINTMENT_DURATION: 30,
+  DEFAULT_SERVICE: 'Corte',
+  POINTS_PER_SOL: 25,
+  DEFAULT_RATING: 5.0,
+  MAX_APPOINTMENTS_TO_SHOW: 5,
+  MAX_CALENDAR_APPOINTMENTS: 2
+};
