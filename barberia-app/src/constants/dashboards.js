@@ -257,7 +257,7 @@ export const CHART_CONFIG = {
 };
 
 // Estados de citas y sus estilos
-export const APPOINTMENT_STATUS = {
+export const APPOINTMENT_STYLES = {
   STYLES: {
     confirmed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
     pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',

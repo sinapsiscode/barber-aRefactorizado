@@ -197,7 +197,6 @@ const TermsAndConditions = ({ isOpen, onClose, onAccept }) => {
       header={renderHeader()}
       footer={renderFooter()}
     >
-
       <div className="prose dark:prose-invert max-w-none space-y-6">
         {renderWelcomeSection()}
         {renderServicesSection()}
@@ -210,5 +209,6 @@ const TermsAndConditions = ({ isOpen, onClose, onAccept }) => {
       </div>
     </Modal>
   );
+};
 
 export default TermsAndConditions;

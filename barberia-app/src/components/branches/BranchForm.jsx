@@ -18,7 +18,6 @@ const BranchForm = ({ branch = null, onClose }) => {
     clearFieldError
   } = useBranchForm(branch, onClose);
 
-
   const title = branch ? BRANCH_LABELS.FORM.EDIT_TITLE : BRANCH_LABELS.FORM.NEW_TITLE;
 
   const renderBasicInfo = () => (
@@ -190,7 +189,6 @@ const BranchForm = ({ branch = null, onClose }) => {
       size="xl"
       footer={renderFooter()}
     >
-
       <form onSubmit={handleSubmit} className="space-y-8">
         {renderBasicInfo()}
         {renderContactInfo()}
@@ -198,5 +196,6 @@ const BranchForm = ({ branch = null, onClose }) => {
       </form>
     </Modal>
   );
+};
 
 export default BranchForm;

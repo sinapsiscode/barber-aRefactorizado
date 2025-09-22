@@ -195,7 +195,6 @@ const ClientForm = ({ client = null, onClose, onSuccess }) => {
       size="lg"
       footer={renderFooter()}
     >
-
       <form onSubmit={handleSubmit} className="space-y-6">
         {renderBasicInfo()}
         {renderContactInfo()}
@@ -206,5 +205,6 @@ const ClientForm = ({ client = null, onClose, onSuccess }) => {
       </form>
     </Modal>
   );
+};
 
 export default ClientForm;

@@ -18,7 +18,7 @@ import {
   DASHBOARD_METRICS,
   METRIC_COLORS,
   QUICK_ACTIONS,
-  APPOINTMENT_STATUS
+  APPOINTMENT_STYLES
 } from '../constants';
 import { useDashboard } from './useDashboard';
 
@@ -180,11 +180,11 @@ export const useReceptionDashboard = () => {
 
   // Funciones utilitarias para agenda
   const getStatusStyle = (status) => {
-    return APPOINTMENT_STATUS.STYLES[status] || APPOINTMENT_STATUS.STYLES.completed;
+    return APPOINTMENT_STYLES.STYLES[status] || APPOINTMENT_STYLES.STYLES.completed;
   };
 
   const getStatusText = (status) => {
-    return APPOINTMENT_STATUS.LABELS[status] || status;
+    return APPOINTMENT_STYLES.LABELS[status] || status;
   };
 
   const handleConfirmAppointment = (appointment) => {
