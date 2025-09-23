@@ -1,3 +1,9 @@
+// ===================================================================
+// 💈 PÁGINA DE CITAS DEL BARBERO - REFACTORIZADO
+// ===================================================================
+// Vista principal para que los barberos gestionen sus citas diarias
+
+import React from 'react';
 import { useBarberAppointments } from '../hooks/useBarberAppointments';
 import { VIEW_MODES } from '../constants/barberAppointments';
 
