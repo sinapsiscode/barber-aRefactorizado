@@ -135,22 +135,23 @@ const LandingPage = ({ onNavigateToLogin, onNavigateToBooking }) => {
         {/* Logo Section */}
         <div className="mb-12 text-center">
           {/* Main Logo */}
-          <div className="relative inline-block mb-6">
-            <div className="h-32 w-32 bg-gradient-to-br from-[#FFB800] to-[#CC9200] rounded-full flex items-center justify-center mx-auto transform rotate-3 shadow-2xl shadow-[#FFB800]/50">
-              <div className="text-4xl font-bold text-black">EC</div>
-            </div>
-            <div className="absolute -inset-4 bg-[#FFB800]/20 rounded-full blur-xl animate-pulse" />
+          <div className="mb-8">
+            <img
+              src="/logo.png"
+              alt="Awaken World University"
+              className="h-48 w-auto mx-auto"
+            />
           </div>
 
           {/* Brand Name */}
-          <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FFB800] to-[#FFA500] mb-4">
-            BARBER STUDIO
+          <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: '#ffc000' }}>
+            AWAKEN WORLD UNIVERSITY
           </h1>
           <div className="text-lg md:text-xl text-[#B8B8B8] uppercase tracking-[0.3em] mb-2">
-            BARBER STUDIO
+            Sistema de Gestión de Barberías
           </div>
           <div className="text-sm text-[#808080] italic">
-            Maestros del arte del corte
+            Excelencia en gestión y servicio
           </div>
 
           {/* Instagram Handle */}

@@ -122,26 +122,37 @@ const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange }) => {
     }`}>
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-center justify-between p-4">
+        <div className="p-4">
           {!isCollapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-600 elevation-1">
-                <FiScissors className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                  Barbería Pro
-                </h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Sistema de Gestión</p>
-              </div>
+            <div className="flex items-center justify-between">
+              <img
+                src="/logo.png"
+                alt="Awaken World"
+                className="w-16 h-16 object-contain"
+              />
+              <button
+                onClick={onToggle}
+                className="p-2 text-gray-700 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 dark:text-gray-300 ripple"
+              >
+                <FiMenu className="w-5 h-5" />
+              </button>
             </div>
           )}
-          <button
-            onClick={onToggle}
-            className="p-2 text-gray-700 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 dark:text-gray-300 ripple"
-          >
-            <FiMenu className="w-5 h-5" />
-          </button>
+          {isCollapsed && (
+            <div className="flex flex-col items-center gap-2">
+              <img
+                src="/logo.png"
+                alt="Awaken World"
+                className="w-12 h-12 object-contain"
+              />
+              <button
+                onClick={onToggle}
+                className="p-2 text-gray-700 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 dark:text-gray-300 ripple"
+              >
+                <FiMenu className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Navigation */}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FiUser, FiLock, FiEye, FiEyeOff, FiScissors } from 'react-icons/fi';
+import { FiUser, FiLock, FiEye, FiEyeOff, FiScissors, FiMail } from 'react-icons/fi';
 import { useAuthStore } from '../../stores';
 import RegisterForm from './RegisterForm';
 import Swal from 'sweetalert2';
@@ -15,6 +15,7 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState({ email: false, password: false });
   const [showRegister, setShowRegister] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { login, isLoading } = useAuthStore();
 
   // Si está mostrando registro, renderizar RegisterForm
@@ -80,6 +81,56 @@ const LoginForm = () => {
     setCredentials({ email, password });
   };
 
+  const handleForgotPassword = async () => {
+    const { value: email } = await MySwal.fire({
+      title: 'Recuperar Contraseña',
+      html: `
+        <div class="text-left">
+          <p class="text-[#B8B8B8] mb-4">Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
+        </div>
+      `,
+      input: 'email',
+      inputPlaceholder: 'tu@email.com',
+      inputAttributes: {
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Enviar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#FFB800',
+      cancelButtonColor: '#808080',
+      background: '#1A1A1A',
+      color: '#FFFFFF',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Por favor ingresa tu correo electrónico';
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          return 'Por favor ingresa un correo electrónico válido';
+        }
+      }
+    });
+
+    if (email) {
+      // Simular envío de correo (solo frontend)
+      await MySwal.fire({
+        icon: 'success',
+        title: '¡Correo Enviado!',
+        html: `
+          <div class="text-left">
+            <p class="text-[#B8B8B8] mb-2">Se ha enviado un enlace de recuperación a:</p>
+            <p class="text-[#FFB800] font-semibold mb-4">${email}</p>
+            <p class="text-[#808080] text-sm">Por favor revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.</p>
+          </div>
+        `,
+        confirmButtonColor: '#FFB800',
+        background: '#1A1A1A',
+        color: '#FFFFFF'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] relative overflow-hidden">
       {/* Premium background effects */}
@@ -91,17 +142,18 @@ const LoginForm = () => {
         <div className="bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] rounded-3xl shadow-2xl shadow-black/50 p-10 border border-[#FFB800]/20 backdrop-blur-xl">
           {/* Premium Header */}
           <div className="text-center mb-10">
-            <div className="relative inline-block mb-6">
-              <div className="h-24 w-24 bg-gradient-to-br from-[#FFB800] to-[#CC9200] rounded-2xl flex items-center justify-center mx-auto transform rotate-3 shadow-2xl shadow-[#FFB800]/30">
-                <FiScissors className="h-12 w-12 text-black transform -rotate-45" />
-              </div>
-              <div className="absolute -inset-2 bg-[#FFB800]/20 rounded-2xl blur-xl animate-pulse" />
+            <div className="mb-6">
+              <img
+                src="/logo.png"
+                alt="Awaken World University"
+                className="h-40 w-auto mx-auto"
+              />
             </div>
-            <h2 className="text-4xl font-bold gradient-text mb-2">
-              BARBERÍA PREMIUM
+            <h2 className="text-3xl font-bold mb-2" style={{ color: '#ffc000' }}>
+              AWAKEN WORLD UNIVERSITY
             </h2>
             <p className="text-[#B8B8B8] text-sm uppercase tracking-widest">
-              Sistema de Gestión Exclusivo
+              Sistema de Gestión de Barberías
             </p>
           </div>
 
@@ -187,6 +239,17 @@ const LoginForm = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-[#FFA500] to-[#FFB800] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
           </form>
+
+          {/* Forgot Password Link */}
+          <div className="mt-4 text-center">
+            <button
+              onClick={handleForgotPassword}
+              className="text-[#B8B8B8] hover:text-[#FFB800] text-sm transition-colors duration-200 flex items-center justify-center gap-2 mx-auto"
+            >
+              <FiMail className="w-4 h-4" />
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
 
           {/* Premium Demo Credentials */}
           <div className="mt-8 p-4 bg-[#000000] rounded-xl border border-[#FFB800]/10">
