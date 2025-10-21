@@ -45,7 +45,7 @@ server.use(cors({
     }
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-role-id', 'x-user-id', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'x-role-id', 'x-user-id', 'Authorization', 'Cache-Control', 'Pragma', 'Expires'],
   credentials: true
 }));
 

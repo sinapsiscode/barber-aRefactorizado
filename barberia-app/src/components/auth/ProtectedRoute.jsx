@@ -13,7 +13,8 @@ const ProtectedRoute = ({ children, requiredRole = null, requiredPermission = nu
     return <LoginForm />;
   }
 
-  if (requiredRole && user.role !== requiredRole && user.role !== 'super_admin') {
+  const userRole = user?.roleSlug || user?.role;
+  if (requiredRole && userRole !== requiredRole && userRole !== 'super_admin') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-dark-900">
         <div className="max-w-md w-full bg-white dark:bg-dark-800 rounded-lg shadow-lg p-8 text-center">

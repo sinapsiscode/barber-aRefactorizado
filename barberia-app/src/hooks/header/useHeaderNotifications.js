@@ -25,7 +25,7 @@ export const useHeaderNotifications = (user) => {
     const today = new Date().toISOString().split('T')[0];
     let count = 0;
 
-    switch (user.role) {
+    switch (user.roleSlug || user.role) {
       case 'super_admin':
         const clientsForWarning = getClientsForWarning();
         count += clientsForWarning.length;
@@ -83,7 +83,7 @@ export const useHeaderNotifications = (user) => {
     const today = new Date().toISOString().split('T')[0];
     const newNotifications = [];
 
-    switch (user.role) {
+    switch (user.roleSlug || user.role) {
       case 'super_admin':
         const clientsForWarning = getClientsForWarning();
         clientsForWarning.forEach(client => {

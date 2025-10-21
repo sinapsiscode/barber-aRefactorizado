@@ -31,7 +31,38 @@ const useClientStore = create(
       loadClients: async () => {
         set({ isLoading: true, error: null });
         try {
-          const clients = await clientesApiExtended.getAll();
+          const clientesBackend = await clientesApiExtended.getAll();
+
+          // Mapear datos de español (backend) a inglés (frontend)
+          const clients = clientesBackend.map(cliente => ({
+            id: cliente.id,
+            name: cliente.nombre,
+            email: cliente.email,
+            phone: cliente.telefono,
+            birthDate: cliente.fechaNacimiento,
+            address: cliente.direccion,
+            preferredBranch: cliente.sucursalPreferida,
+            preferredBarber: cliente.barberoPreferido,
+            loyaltyPoints: cliente.puntosLealtad || 0,
+            totalVisits: cliente.totalVisitas || 0,
+            totalSpent: cliente.totalGastado || 0,
+            preferredServices: cliente.serviciosPreferidos || [],
+            notes: cliente.notas || '',
+            status: cliente.estado || 'active',
+            lastVisit: cliente.ultimaVisita,
+            createdAt: cliente.createdAt,
+            updatedAt: cliente.updatedAt,
+            // Campos adicionales de seguridad
+            isFlagged: cliente.esProblematico || false,
+            flagReason: cliente.razonProblema || '',
+            isUnwelcome: cliente.noEstaBienvenido || false,
+            blacklistReason: cliente.razonBlacklist || '',
+            // Campos de recordatorios
+            cutoffWarningInterval: cliente.intervaloAvisoCorte || 15,
+            lastWarningDate: cliente.fechaUltimoAviso || null,
+            warningEnabled: cliente.avisoHabilitado !== false
+          }));
+
           set({ clients, isLoading: false });
           return { success: true };
         } catch (error) {
@@ -47,21 +78,55 @@ const useClientStore = create(
       addClient: async (clientData) => {
         set({ isLoading: true, error: null });
         try {
-          const newClient = {
-            ...clientData,
-            status: 'active',
-            loyaltyPoints: 0,
-            totalVisits: 0,
-            totalSpent: 0,
-            cutoffWarningInterval: clientData.cutoffWarningInterval || 15,
-            lastWarningDate: null,
-            warningEnabled: true,
+          // Mapear datos de inglés (frontend) a español (backend)
+          const clienteBackend = {
+            nombre: clientData.name,
+            email: clientData.email,
+            telefono: clientData.phone,
+            fechaNacimiento: clientData.birthDate,
+            direccion: clientData.address,
+            sucursalPreferida: clientData.preferredBranch,
+            barberoPreferido: clientData.preferredBarber,
+            puntosLealtad: 0,
+            totalVisitas: 0,
+            totalGastado: 0,
+            serviciosPreferidos: clientData.preferredServices || [],
+            notas: clientData.notes || '',
+            estado: 'active',
+            ultimaVisita: null,
+            intervaloAvisoCorte: clientData.cutoffWarningInterval || 15,
+            fechaUltimoAviso: null,
+            avisoHabilitado: true,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };
 
           // Crear en API
-          const createdClient = await clientesApiExtended.create(newClient);
+          const createdClientBackend = await clientesApiExtended.create(clienteBackend);
+
+          // Mapear respuesta de español a inglés
+          const createdClient = {
+            id: createdClientBackend.id,
+            name: createdClientBackend.nombre,
+            email: createdClientBackend.email,
+            phone: createdClientBackend.telefono,
+            birthDate: createdClientBackend.fechaNacimiento,
+            address: createdClientBackend.direccion,
+            preferredBranch: createdClientBackend.sucursalPreferida,
+            preferredBarber: createdClientBackend.barberoPreferido,
+            loyaltyPoints: createdClientBackend.puntosLealtad || 0,
+            totalVisits: createdClientBackend.totalVisitas || 0,
+            totalSpent: createdClientBackend.totalGastado || 0,
+            preferredServices: createdClientBackend.serviciosPreferidos || [],
+            notes: createdClientBackend.notas || '',
+            status: createdClientBackend.estado,
+            lastVisit: createdClientBackend.ultimaVisita,
+            createdAt: createdClientBackend.createdAt,
+            updatedAt: createdClientBackend.updatedAt,
+            cutoffWarningInterval: createdClientBackend.intervaloAvisoCorte || 15,
+            lastWarningDate: createdClientBackend.fechaUltimoAviso,
+            warningEnabled: createdClientBackend.avisoHabilitado !== false
+          };
 
           // Actualizar estado local
           set(state => ({
@@ -82,13 +147,63 @@ const useClientStore = create(
       updateClient: async (id, updates) => {
         set({ isLoading: true, error: null });
         try {
-          const updatedData = {
-            ...updates,
-            updatedAt: new Date().toISOString()
-          };
+          // Mapear campos de inglés a español para el backend
+          const updatesBackend = {};
+
+          if (updates.name !== undefined) updatesBackend.nombre = updates.name;
+          if (updates.email !== undefined) updatesBackend.email = updates.email;
+          if (updates.phone !== undefined) updatesBackend.telefono = updates.phone;
+          if (updates.birthDate !== undefined) updatesBackend.fechaNacimiento = updates.birthDate;
+          if (updates.address !== undefined) updatesBackend.direccion = updates.address;
+          if (updates.preferredBranch !== undefined) updatesBackend.sucursalPreferida = updates.preferredBranch;
+          if (updates.preferredBarber !== undefined) updatesBackend.barberoPreferido = updates.preferredBarber;
+          if (updates.loyaltyPoints !== undefined) updatesBackend.puntosLealtad = updates.loyaltyPoints;
+          if (updates.totalVisits !== undefined) updatesBackend.totalVisitas = updates.totalVisits;
+          if (updates.totalSpent !== undefined) updatesBackend.totalGastado = updates.totalSpent;
+          if (updates.preferredServices !== undefined) updatesBackend.serviciosPreferidos = updates.preferredServices;
+          if (updates.notes !== undefined) updatesBackend.notas = updates.notes;
+          if (updates.status !== undefined) updatesBackend.estado = updates.status;
+          if (updates.lastVisit !== undefined) updatesBackend.ultimaVisita = updates.lastVisit;
+          if (updates.cutoffWarningInterval !== undefined) updatesBackend.intervaloAvisoCorte = updates.cutoffWarningInterval;
+          if (updates.lastWarningDate !== undefined) updatesBackend.fechaUltimoAviso = updates.lastWarningDate;
+          if (updates.warningEnabled !== undefined) updatesBackend.avisoHabilitado = updates.warningEnabled;
+          if (updates.isFlagged !== undefined) updatesBackend.esProblematico = updates.isFlagged;
+          if (updates.flagReason !== undefined) updatesBackend.razonProblema = updates.flagReason;
+          if (updates.isUnwelcome !== undefined) updatesBackend.noEstaBienvenido = updates.isUnwelcome;
+          if (updates.blacklistReason !== undefined) updatesBackend.razonBlacklist = updates.blacklistReason;
+
+          updatesBackend.updatedAt = new Date().toISOString();
 
           // Actualizar en API
-          const updatedClient = await clientesApiExtended.patch(id, updatedData);
+          const updatedClientBackend = await clientesApiExtended.patch(id, updatesBackend);
+
+          // Mapear respuesta de español a inglés
+          const updatedClient = {
+            id: updatedClientBackend.id,
+            name: updatedClientBackend.nombre,
+            email: updatedClientBackend.email,
+            phone: updatedClientBackend.telefono,
+            birthDate: updatedClientBackend.fechaNacimiento,
+            address: updatedClientBackend.direccion,
+            preferredBranch: updatedClientBackend.sucursalPreferida,
+            preferredBarber: updatedClientBackend.barberoPreferido,
+            loyaltyPoints: updatedClientBackend.puntosLealtad || 0,
+            totalVisits: updatedClientBackend.totalVisitas || 0,
+            totalSpent: updatedClientBackend.totalGastado || 0,
+            preferredServices: updatedClientBackend.serviciosPreferidos || [],
+            notes: updatedClientBackend.notas || '',
+            status: updatedClientBackend.estado,
+            lastVisit: updatedClientBackend.ultimaVisita,
+            createdAt: updatedClientBackend.createdAt,
+            updatedAt: updatedClientBackend.updatedAt,
+            isFlagged: updatedClientBackend.esProblematico || false,
+            flagReason: updatedClientBackend.razonProblema || '',
+            isUnwelcome: updatedClientBackend.noEstaBienvenido || false,
+            blacklistReason: updatedClientBackend.razonBlacklist || '',
+            cutoffWarningInterval: updatedClientBackend.intervaloAvisoCorte || 15,
+            lastWarningDate: updatedClientBackend.fechaUltimoAviso,
+            warningEnabled: updatedClientBackend.avisoHabilitado !== false
+          };
 
           // Actualizar estado local
           set(state => ({
@@ -524,7 +639,7 @@ const useClientStore = create(
 
       getCurrentClientData: () => {
         const { user } = useAuthStore.getState();
-        if (!user || user.role !== 'client') return null;
+        if (!user || user.roleSlug !== 'client') return null;
 
         // Primero intenta buscar en el array local
         let client = get().getClientByEmail(user.email);

@@ -11,7 +11,7 @@ const UserProfile = ({ user }) => {
           {user.name}
         </p>
         <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">
-          {user.role?.replace('_', ' ')}
+          {(user.roleSlug || user.role)?.replace('_', ' ')}
         </p>
       </div>
       <div className="h-10 w-10 bg-primary-600 rounded-full flex items-center justify-center text-white font-medium">

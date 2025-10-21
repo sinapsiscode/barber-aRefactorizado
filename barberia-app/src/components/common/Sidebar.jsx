@@ -237,7 +237,7 @@ const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange }) => {
                     {user.name}
                   </p>
                   <p className="text-xs text-gray-600 capitalize dark:text-gray-400">
-                    {user.role?.replace('_', ' ')}
+                    {(user.roleSlug || user.role)?.replace('_', ' ')}
                   </p>
                 </div>
               </div>

@@ -6,18 +6,20 @@ import { RECENT_HISTORY_LIMIT } from '../../constants/clientDashboard';
  * Hook para obtener y calcular todos los datos necesarios del dashboard del cliente
  */
 export const useClientDashboardData = (user) => {
-  const { getCurrentClientData, calculateLoyaltyTier } = useClientStore();
-  const { getAppointmentsByClient } = useAppointmentStore();
+  const clientStore = useClientStore();
+  const appointmentStore = useAppointmentStore();
   const { barbers } = useStaffStore();
   const { branches } = useBranchStore();
 
   // Obtener datos del cliente actual
-  const currentClient = getCurrentClientData(user);
+  const currentClient = clientStore.getCurrentClientData(user);
 
   // Calcular citas del cliente
+  // Depende de appointments del store, no de la función
   const clientAppointments = useMemo(() => {
-    return currentClient ? getAppointmentsByClient(currentClient.id) : [];
-  }, [currentClient, getAppointmentsByClient]);
+    return currentClient ? appointmentStore.getAppointmentsByClient(currentClient.id) : [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentClient?.id, appointmentStore.appointments]);
 
   // Filtrar citas próximas
   const upcomingAppointments = useMemo(() => {
@@ -40,9 +42,11 @@ export const useClientDashboardData = (user) => {
   }, [branches, currentClient?.preferredBranch]);
 
   // Tier de lealtad
+  // Depende del cliente, no de la función
   const tier = useMemo(() => {
-    return currentClient ? calculateLoyaltyTier(currentClient) : 'Bronze';
-  }, [currentClient, calculateLoyaltyTier]);
+    return currentClient ? clientStore.calculateLoyaltyTier(currentClient) : 'Bronze';
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentClient?.loyaltyPoints]);
 
   // Historial reciente
   const recentHistory = useMemo(() => {

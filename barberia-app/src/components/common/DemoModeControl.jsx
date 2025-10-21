@@ -34,7 +34,8 @@ const DemoModeControl = () => {
   }, []);
 
   // Solo mostrar para admin y superadmin
-  if (!user || (user.role !== 'super_admin' && user.role !== 'branch_admin')) {
+  const userRole = user?.roleSlug || user?.role;
+  if (!user || (userRole !== 'super_admin' && userRole !== 'branch_admin')) {
     return null;
   }
 

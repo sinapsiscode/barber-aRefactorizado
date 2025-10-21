@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useClientStore } from '../../stores';
 
 /**
@@ -11,6 +11,16 @@ export const useWarningSettings = (currentClient) => {
     enabled: currentClient?.warningEnabled !== false,
     interval: currentClient?.cutoffWarningInterval || 15
   });
+
+  // Sincronizar settings cuando cambia el cliente
+  useEffect(() => {
+    if (currentClient) {
+      setWarningSettings({
+        enabled: currentClient.warningEnabled !== false,
+        interval: currentClient.cutoffWarningInterval || 15
+      });
+    }
+  }, [currentClient?.id]); // Solo depende del ID, no del objeto completo
 
   const handleWarningSettingsChange = (field, value) => {
     setWarningSettings(prev => ({ ...prev, [field]: value }));

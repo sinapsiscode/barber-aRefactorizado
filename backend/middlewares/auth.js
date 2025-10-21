@@ -165,9 +165,15 @@ function requireBranchAccess(req, res, next) {
       const pathParts = req.path.split('/').filter(p => p);
       const resource = pathParts[0];
 
-      // Para clientes, filtrar solo su propia información
+      // Para clientes, filtrar solo su propia información por email
       if (resource === 'clientes') {
-        req.query.id = userId;
+        // Buscar el email del usuario en la BD
+        const db = loadDatabase();
+        const user = db.usuarios.find(u => u.id === parseInt(userId));
+        if (user && user.email) {
+          req.query.email = user.email;
+          console.log(`🔍 [AUTH] Filtrando clientes por email: ${user.email}`);
+        }
       }
       // Para citas, filtrar por clienteId
       if (resource === 'citas') {

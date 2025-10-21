@@ -108,24 +108,24 @@ function App() {
         const roleSpecificPromises = [];
 
         // Solo admins y recepción cargan lista completa de clientes y staff
-        if (['super_admin', 'branch_admin', 'reception'].includes(user.role)) {
+        if (['super_admin', 'branch_admin', 'reception'].includes(user.roleSlug || user.role)) {
           roleSpecificPromises.push(loadClients());
           roleSpecificPromises.push(loadStaff());
         }
 
         // Solo admins cargan datos financieros
-        if (['super_admin', 'branch_admin'].includes(user.role)) {
+        if (['super_admin', 'branch_admin'].includes(user.roleSlug || user.role)) {
           roleSpecificPromises.push(loadFinancialData());
         }
 
         // Barberos cargan solo su información de staff y datos de clientes (filtrados por backend)
-        if (user.role === 'barber') {
+        if ((user.roleSlug || user.role) === 'barber') {
           roleSpecificPromises.push(loadStaff());
           roleSpecificPromises.push(loadClients()); // Necesario para ver info de clientes en citas
         }
 
         // Clientes cargan su propia información y barberos disponibles
-        if (user.role === 'client') {
+        if ((user.roleSlug || user.role) === 'client') {
           roleSpecificPromises.push(loadClients()); // Backend filtrará solo su info
           roleSpecificPromises.push(loadStaff()); // Para ver barberos disponibles
         }
