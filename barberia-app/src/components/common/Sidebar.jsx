@@ -14,7 +14,7 @@ import {
 } from 'react-icons/fi';
 import { useAuthStore } from '../../stores';
 
-const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange }) => {
+const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange, isMobileOpen = false, onMobileClose }) => {
   const { user, logout, canAccessModule } = useAuthStore();
 
   const menuItems = [
@@ -116,30 +116,55 @@ const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange }) => {
 
   const filteredMenuItems = getOrderedMenuItems();
 
+  const handleMenuClick = (page) => {
+    if (onPageChange) {
+      onPageChange(page);
+    }
+    // Cerrar sidebar en mobile después de seleccionar
+    if (onMobileClose && window.innerWidth < 1024) {
+      onMobileClose();
+    }
+  };
+
   return (
-    <div className={`relative transition-all duration-300 bg-white dark:bg-black ${
-      isCollapsed ? 'w-16' : 'w-64'
-    }`}>
-      <div className="flex flex-col h-full">
-        {/* Header */}
-        <div className="p-4">
-          {!isCollapsed && (
+    <>
+      {/* Mobile overlay backdrop */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed lg:relative inset-y-0 left-0 z-50
+        transition-all duration-300 bg-white dark:bg-black
+        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        ${isCollapsed ? 'w-64 lg:w-16' : 'w-64'}
+      `}>
+        <div className="flex flex-col h-full">
+        {/* Header - always expanded on mobile */}
+        <div className="p-3 sm:p-4">
+          {/* Mobile & Desktop expanded */}
+          {(!isCollapsed || window.innerWidth < 1024) && (
             <div className="flex items-center justify-between">
               <img
                 src="/logo.png"
                 alt="Awaken World"
-                className="w-16 h-16 object-contain"
+                className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
               />
               <button
                 onClick={onToggle}
-                className="p-2 text-gray-700 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 dark:text-gray-300 ripple"
+                className="p-2 text-gray-700 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 dark:text-gray-300 ripple hidden lg:block"
               >
                 <FiMenu className="w-5 h-5" />
               </button>
             </div>
           )}
+          {/* Desktop collapsed - only show on lg+ screens */}
           {isCollapsed && (
-            <div className="flex flex-col items-center gap-2">
+            <div className="hidden lg:flex flex-col items-center gap-2">
               <img
                 src="/logo.png"
                 alt="Awaken World"
@@ -155,25 +180,26 @@ const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange }) => {
           )}
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-2 py-4">
-          <ul className="space-y-1">
+        {/* Navigation - responsive spacing */}
+        <nav className="flex-1 px-2 py-2 sm:py-4 overflow-y-auto">
+          <ul className="space-y-0.5 sm:space-y-1">
             {filteredMenuItems.map((item, index) => (
               <li key={item.name}>
                 <button
-                  onClick={() => onPageChange && onPageChange(item.page)}
-                  className={`flex items-center px-4 py-3 w-full rounded-lg transition-all duration-200 ripple ${
-                    currentPage === item.page 
-                      ? 'bg-primary-50 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400' 
+                  onClick={() => handleMenuClick(item.page)}
+                  className={`flex items-center px-3 sm:px-4 py-2.5 sm:py-3 w-full rounded-lg transition-all duration-200 ripple ${
+                    currentPage === item.page
+                      ? 'bg-primary-50 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900'
                   }`}
-                  title={isCollapsed ? item.name : ''}
+                  title={isCollapsed && window.innerWidth >= 1024 ? item.name : ''}
                 >
-                  <div className={`flex items-center ${isCollapsed ? 'justify-center' : ''}`}>
-                    <item.icon className={`h-5 w-5 ${
+                  <div className={`flex items-center ${isCollapsed && window.innerWidth >= 1024 ? 'justify-center' : ''}`}>
+                    <item.icon className={`h-5 w-5 flex-shrink-0 ${
                       currentPage === item.page ? '' : 'text-gray-500 dark:text-gray-400'
                     }`} />
-                    {!isCollapsed && (
+                    {/* Always show text on mobile, conditionally on desktop */}
+                    {(!isCollapsed || window.innerWidth < 1024) && (
                       <span className="ml-3 text-sm font-medium">
                         {item.name}
                       </span>
@@ -185,36 +211,36 @@ const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange }) => {
           </ul>
         </nav>
 
-        {/* User Info & Settings */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="mb-4 space-y-1">
-            <button 
-              onClick={() => onPageChange && onPageChange('settings')}
-              className={`flex items-center px-4 py-3 w-full rounded-lg transition-all duration-200 ripple ${
-                currentPage === 'settings' 
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
+        {/* User Info & Settings - responsive spacing */}
+        <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="mb-3 sm:mb-4 space-y-0.5 sm:space-y-1">
+            <button
+              onClick={() => handleMenuClick('settings')}
+              className={`flex items-center px-3 sm:px-4 py-2.5 sm:py-3 w-full rounded-lg transition-all duration-200 ripple ${
+                currentPage === 'settings'
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
-              <div className={`flex items-center ${isCollapsed ? 'justify-center' : ''}`}>
-                <FiSettings className={`h-5 w-5 ${
+              <div className={`flex items-center ${isCollapsed && window.innerWidth >= 1024 ? 'justify-center' : ''}`}>
+                <FiSettings className={`h-5 w-5 flex-shrink-0 ${
                   currentPage === 'settings' ? '' : 'text-gray-500 dark:text-gray-400'
                 }`} />
-                {!isCollapsed && (
+                {(!isCollapsed || window.innerWidth < 1024) && (
                   <span className="ml-3 text-sm font-medium">
                     Configuración
                   </span>
                 )}
               </div>
             </button>
-            
-            <button 
+
+            <button
               onClick={handleLogout}
-              className="flex items-center w-full px-4 py-3 text-gray-700 transition-all duration-200 rounded-lg ripple dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+              className="flex items-center w-full px-3 sm:px-4 py-2.5 sm:py-3 text-gray-700 transition-all duration-200 rounded-lg ripple dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
             >
-              <div className={`flex items-center ${isCollapsed ? 'justify-center' : ''}`}>
-                <FiLogOut className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                {!isCollapsed && (
+              <div className={`flex items-center ${isCollapsed && window.innerWidth >= 1024 ? 'justify-center' : ''}`}>
+                <FiLogOut className="w-5 h-5 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                {(!isCollapsed || window.innerWidth < 1024) && (
                   <span className="ml-3 text-sm font-medium">
                     Cerrar Sesión
                   </span>
@@ -223,20 +249,21 @@ const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange }) => {
             </button>
           </div>
 
-          {!isCollapsed && user && (
-            <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-950">
-              <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <div className="flex items-center justify-center w-10 h-10 font-medium text-white rounded-full bg-primary-600">
+          {/* User info - always show on mobile, conditionally on desktop */}
+          {(!isCollapsed || window.innerWidth < 1024) && user && (
+            <div className="p-2.5 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-950">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="relative flex-shrink-0">
+                  <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base font-medium text-white rounded-full bg-primary-600">
                     {user.name?.charAt(0).toUpperCase()}
                   </div>
-                  <div className="absolute w-3 h-3 bg-green-500 border-2 border-white rounded-full -bottom-1 -right-1 dark:border-black" />
+                  <div className="absolute w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 border-2 border-white rounded-full -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 dark:border-black" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate dark:text-gray-100">
+                  <p className="text-xs sm:text-sm font-medium text-gray-900 truncate dark:text-gray-100">
                     {user.name}
                   </p>
-                  <p className="text-xs text-gray-600 capitalize dark:text-gray-400">
+                  <p className="text-[10px] sm:text-xs text-gray-600 capitalize dark:text-gray-400 truncate">
                     {(user.roleSlug || user.role)?.replace('_', ' ')}
                   </p>
                 </div>
@@ -245,7 +272,8 @@ const Sidebar = ({ isCollapsed, onToggle, currentPage, onPageChange }) => {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
