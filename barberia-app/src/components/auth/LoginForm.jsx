@@ -71,7 +71,7 @@ const LoginForm = () => {
 
   const demoCredentials = [
     { role: 'Super Admin', email: 'admin@barberia.com', password: 'admin123', icon: '👑' },
-    { role: 'Admin Sede', email: 'admin.sede@barberia.com', password: 'admin123', icon: '🏢' },
+    { role: 'Admin Sede Lima', email: 'admin.lima@barberia.com', password: 'admin123', icon: '🏢' },
     { role: 'Recepción', email: 'recepcion@barberia.com', password: 'recepcion123', icon: '📋' },
     { role: 'Barbero', email: 'barbero@barberia.com', password: 'barbero123', icon: '✂️' },
     { role: 'Cliente', email: 'cliente@barberia.com', password: 'cliente123', icon: '👤' }

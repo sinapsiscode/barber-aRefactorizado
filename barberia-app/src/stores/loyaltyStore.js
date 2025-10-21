@@ -1,15 +1,27 @@
+/**
+ * LOYALTY STORE - REFACTORIZADO CON JSON SERVER
+ *
+ * Cambios:
+ * ✅ Migrado a API real (recompensasApi, transaccionesPuntosApi, recompensasClienteApi)
+ * ✅ Eliminado hardcode de mockData
+ * ✅ CRUD completo para recompensas, transacciones de puntos y recompensas de cliente
+ * ✅ Lógica de negocio (cálculos, niveles) mantenida localmente
+ * ✅ Persist middleware ya existente
+ * ✅ Integración con otros stores mantenida
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import mockData from '../data/data.json';
+import { recompensasApi, transaccionesPuntosApi, recompensasClienteApi, nivelesLealtadApi, puntosSettingsApi } from '../services/api';
 
 const useLoyaltyStore = create(
   persist(
     (set, get) => ({
       // Estado inicial
-      rewards: mockData.loyaltyRewards || [],
-      pointsTransactions: mockData.pointsTransactions || [],
-      clientRewards: mockData.clientRewards || [],
-      loyaltyLevels: mockData.loyaltyLevels || [
+      rewards: [],
+      pointsTransactions: [],
+      clientRewards: [],
+      loyaltyLevels: [
         {
           id: 1,
           name: 'Bronce',
@@ -71,7 +83,7 @@ const useLoyaltyStore = create(
           }
         }
       ],
-      settings: mockData.pointsSettings || {
+      settings: {
         pointsPerSol: 1,
         enabled: true,
         minimumPointsToRedeem: 50,
@@ -80,20 +92,445 @@ const useLoyaltyStore = create(
         birthdayBonusPoints: 100,
         referralBonusPoints: 150
       },
+      isLoading: false,
+      error: null,
 
-      // Obtener recompensas disponibles
+      /**
+       * CARGAR RECOMPENSAS - Fetch desde API
+       */
+      loadRewards: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const recompensasData = await recompensasApi.getAll();
+
+          // Mapear estructura backend (español) a frontend (inglés)
+          const rewards = recompensasData.map(r => ({
+            id: r.id,
+            name: r.nombre,
+            description: r.descripcion,
+            pointsCost: r.costoEnPuntos,
+            discountType: r.tipoDescuento,
+            discountValue: r.valorDescuento,
+            validityDays: r.diasValidez,
+            category: r.categoria,
+            isActive: r.activo,
+            maxUses: r.usosMaximos,
+            applicableServices: r.serviciosAplicables || [],
+            icon: r.icono,
+            image: r.imagen
+          }));
+
+          set({ rewards, isLoading: false });
+          return { success: true };
+        } catch (error) {
+          console.error('Error cargando recompensas:', error);
+          set({ rewards: [], isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * CARGAR TRANSACCIONES DE PUNTOS - Fetch desde API
+       */
+      loadPointsTransactions: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const transaccionesData = await transaccionesPuntosApi.getAll();
+
+          // Mapear estructura backend (español) a frontend (inglés)
+          const pointsTransactions = transaccionesData.map(t => ({
+            id: t.id,
+            clientId: t.clienteId,
+            type: t.tipo,
+            points: t.puntos,
+            description: t.descripcion,
+            reference: t.referencia,
+            referenceId: t.referenciaId,
+            date: t.fecha,
+            branchId: t.sucursalId,
+            rewardId: t.recompensaId
+          }));
+
+          set({ pointsTransactions, isLoading: false });
+          return { success: true };
+        } catch (error) {
+          console.error('Error cargando transacciones de puntos:', error);
+          set({ pointsTransactions: [], isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * CARGAR RECOMPENSAS DE CLIENTES - Fetch desde API
+       */
+      loadClientRewards: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const recompensasClienteData = await recompensasClienteApi.getAll();
+
+          // Mapear estructura backend (español) a frontend (inglés)
+          const clientRewards = recompensasClienteData.map(cr => ({
+            id: cr.id,
+            clientId: cr.clienteId,
+            rewardId: cr.recompensaId,
+            redeemDate: cr.fechaCanje,
+            expiryDate: cr.fechaExpiracion,
+            status: cr.estado,
+            usedDate: cr.fechaUso,
+            branchId: cr.sucursalId,
+            discountCode: cr.codigoDescuento
+          }));
+
+          set({ clientRewards, isLoading: false });
+          return { success: true };
+        } catch (error) {
+          console.error('Error cargando recompensas de clientes:', error);
+          set({ clientRewards: [], isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * AGREGAR RECOMPENSA - POST a API
+       */
+      addReward: async (rewardData) => {
+        set({ isLoading: true, error: null });
+        try {
+          // Mapear a estructura backend
+          const recompensaData = {
+            nombre: rewardData.name,
+            descripcion: rewardData.description,
+            costoEnPuntos: rewardData.pointsCost,
+            tipoDescuento: rewardData.discountType,
+            valorDescuento: rewardData.discountValue,
+            diasValidez: rewardData.validityDays,
+            categoria: rewardData.category,
+            activo: true,
+            usosMaximos: rewardData.maxUses,
+            serviciosAplicables: rewardData.applicableServices || [],
+            icono: rewardData.icon,
+            imagen: rewardData.image
+          };
+
+          const createdRecompensa = await recompensasApi.create(recompensaData);
+
+          // Mapear de vuelta
+          const newReward = {
+            id: createdRecompensa.id,
+            name: createdRecompensa.nombre,
+            description: createdRecompensa.descripcion,
+            pointsCost: createdRecompensa.costoEnPuntos,
+            discountType: createdRecompensa.tipoDescuento,
+            discountValue: createdRecompensa.valorDescuento,
+            validityDays: createdRecompensa.diasValidez,
+            category: createdRecompensa.categoria,
+            isActive: createdRecompensa.activo,
+            maxUses: createdRecompensa.usosMaximos,
+            applicableServices: createdRecompensa.serviciosAplicables,
+            icon: createdRecompensa.icono,
+            image: createdRecompensa.imagen
+          };
+
+          set(state => ({
+            rewards: [...state.rewards, newReward],
+            isLoading: false
+          }));
+
+          return { success: true, reward: newReward };
+        } catch (error) {
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * ACTUALIZAR RECOMPENSA - PATCH a API
+       */
+      updateReward: async (rewardId, updates) => {
+        set({ isLoading: true, error: null });
+        try {
+          // Mapear updates a estructura backend
+          const recompensaUpdates = {};
+          if (updates.name) recompensaUpdates.nombre = updates.name;
+          if (updates.description) recompensaUpdates.descripcion = updates.description;
+          if (updates.pointsCost !== undefined) recompensaUpdates.costoEnPuntos = updates.pointsCost;
+          if (updates.discountType) recompensaUpdates.tipoDescuento = updates.discountType;
+          if (updates.discountValue !== undefined) recompensaUpdates.valorDescuento = updates.discountValue;
+          if (updates.validityDays !== undefined) recompensaUpdates.diasValidez = updates.validityDays;
+          if (updates.category) recompensaUpdates.categoria = updates.category;
+          if (updates.isActive !== undefined) recompensaUpdates.activo = updates.isActive;
+          if (updates.maxUses !== undefined) recompensaUpdates.usosMaximos = updates.maxUses;
+          if (updates.applicableServices) recompensaUpdates.serviciosAplicables = updates.applicableServices;
+          if (updates.icon) recompensaUpdates.icono = updates.icon;
+          if (updates.image) recompensaUpdates.imagen = updates.image;
+
+          const updatedRecompensa = await recompensasApi.patch(rewardId, recompensaUpdates);
+
+          // Mapear de vuelta
+          const updatedReward = {
+            id: updatedRecompensa.id,
+            name: updatedRecompensa.nombre,
+            description: updatedRecompensa.descripcion,
+            pointsCost: updatedRecompensa.costoEnPuntos,
+            discountType: updatedRecompensa.tipoDescuento,
+            discountValue: updatedRecompensa.valorDescuento,
+            validityDays: updatedRecompensa.diasValidez,
+            category: updatedRecompensa.categoria,
+            isActive: updatedRecompensa.activo,
+            maxUses: updatedRecompensa.usosMaximos,
+            applicableServices: updatedRecompensa.serviciosAplicables,
+            icon: updatedRecompensa.icono,
+            image: updatedRecompensa.imagen
+          };
+
+          set(state => ({
+            rewards: state.rewards.map(reward =>
+              reward.id === rewardId ? updatedReward : reward
+            ),
+            isLoading: false
+          }));
+
+          return { success: true, reward: updatedReward };
+        } catch (error) {
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * ELIMINAR RECOMPENSA (soft delete) - PATCH a API
+       */
+      deleteReward: async (rewardId) => {
+        return await get().updateReward(rewardId, { isActive: false });
+      },
+
+      /**
+       * AGREGAR PUNTOS POR SERVICIO - POST transacción de puntos
+       */
+      addPointsForService: async (clientId, servicePrice, branchId, reference = null, referenceId = null) => {
+        const { settings } = get();
+
+        if (!settings.enabled) return;
+
+        const pointsEarned = Math.floor(servicePrice * settings.pointsPerSol);
+
+        try {
+          // Crear transacción en API
+          const transaccionData = {
+            clienteId: clientId,
+            tipo: 'earned',
+            puntos: pointsEarned,
+            descripcion: `Puntos por servicio - S/${servicePrice}`,
+            referencia: reference || 'service',
+            referenciaId: referenceId || null,
+            fecha: new Date().toISOString(),
+            sucursalId: branchId,
+            recompensaId: null
+          };
+
+          const createdTransaccion = await transaccionesPuntosApi.create(transaccionData);
+
+          // Mapear de vuelta
+          const newTransaction = {
+            id: createdTransaccion.id,
+            clientId: createdTransaccion.clienteId,
+            type: createdTransaccion.tipo,
+            points: createdTransaccion.puntos,
+            description: createdTransaccion.descripcion,
+            reference: createdTransaccion.referencia,
+            referenceId: createdTransaccion.referenciaId,
+            date: createdTransaccion.fecha,
+            branchId: createdTransaccion.sucursalId,
+            rewardId: createdTransaccion.recompensaId
+          };
+
+          set(state => ({
+            pointsTransactions: [...state.pointsTransactions, newTransaction]
+          }));
+
+          return pointsEarned;
+        } catch (error) {
+          console.error('Error agregando puntos:', error);
+          return 0;
+        }
+      },
+
+      /**
+       * CANJEAR RECOMPENSA - POST recompensa de cliente + transacción de puntos
+       */
+      redeemReward: async (clientId, rewardId, branchId) => {
+        const { rewards, canRedeemReward } = get();
+
+        if (!canRedeemReward(clientId, rewardId)) {
+          throw new Error('No tienes suficientes puntos para esta recompensa');
+        }
+
+        try {
+          const reward = rewards.find(r => r.id === rewardId);
+          const redemptionDate = new Date();
+          const expiryDate = new Date(redemptionDate.getTime() + (reward.validityDays * 24 * 60 * 60 * 1000));
+
+          // Generar código único
+          const discountCode = `${reward.name.replace(/\s+/g, '').toUpperCase()}-${clientId}-${Date.now().toString().slice(-3)}`;
+
+          // Crear registro de recompensa del cliente en API
+          const recompensaClienteData = {
+            clienteId: clientId,
+            recompensaId: rewardId,
+            fechaCanje: redemptionDate.toISOString(),
+            fechaExpiracion: expiryDate.toISOString(),
+            estado: 'active',
+            fechaUso: null,
+            sucursalId: branchId,
+            codigoDescuento: discountCode
+          };
+
+          const createdRecompensaCliente = await recompensasClienteApi.create(recompensaClienteData);
+
+          // Mapear
+          const newClientReward = {
+            id: createdRecompensaCliente.id,
+            clientId: createdRecompensaCliente.clienteId,
+            rewardId: createdRecompensaCliente.recompensaId,
+            redeemDate: createdRecompensaCliente.fechaCanje,
+            expiryDate: createdRecompensaCliente.fechaExpiracion,
+            status: createdRecompensaCliente.estado,
+            usedDate: createdRecompensaCliente.fechaUso,
+            branchId: createdRecompensaCliente.sucursalId,
+            discountCode: createdRecompensaCliente.codigoDescuento
+          };
+
+          // Crear transacción de puntos negativos en API
+          const transaccionData = {
+            clienteId: clientId,
+            tipo: 'redeemed',
+            puntos: -reward.pointsCost,
+            descripcion: `Canje: ${reward.name}`,
+            referencia: 'reward_redemption',
+            referenciaId: rewardId,
+            fecha: redemptionDate.toISOString(),
+            sucursalId: branchId,
+            recompensaId: rewardId
+          };
+
+          const createdTransaccion = await transaccionesPuntosApi.create(transaccionData);
+
+          // Mapear transacción
+          const pointsTransaction = {
+            id: createdTransaccion.id,
+            clientId: createdTransaccion.clienteId,
+            type: createdTransaccion.tipo,
+            points: createdTransaccion.puntos,
+            description: createdTransaccion.descripcion,
+            reference: createdTransaccion.referencia,
+            referenceId: createdTransaccion.referenciaId,
+            date: createdTransaccion.fecha,
+            branchId: createdTransaccion.sucursalId,
+            rewardId: createdTransaccion.recompensaId
+          };
+
+          // Actualizar estado local
+          set(state => ({
+            clientRewards: [...state.clientRewards, newClientReward],
+            pointsTransactions: [...state.pointsTransactions, pointsTransaction]
+          }));
+
+          return newClientReward;
+        } catch (error) {
+          console.error('Error canjeando recompensa:', error);
+          throw error;
+        }
+      },
+
+      /**
+       * USAR RECOMPENSA - PATCH recompensa de cliente
+       */
+      useReward: async (clientRewardId) => {
+        try {
+          const updatedRecompensaCliente = await recompensasClienteApi.patch(clientRewardId, {
+            estado: 'used',
+            fechaUso: new Date().toISOString()
+          });
+
+          set(state => ({
+            clientRewards: state.clientRewards.map(cr =>
+              cr.id === clientRewardId
+                ? {
+                    ...cr,
+                    status: updatedRecompensaCliente.estado,
+                    usedDate: updatedRecompensaCliente.fechaUso
+                  }
+                : cr
+            )
+          }));
+
+          return { success: true };
+        } catch (error) {
+          console.error('Error usando recompensa:', error);
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * AGREGAR BONO DE BIENVENIDA - POST transacción de puntos
+       */
+      addWelcomeBonus: async (clientId, branchId) => {
+        const { settings } = get();
+
+        if (!settings.enabled || settings.welcomeBonusPoints <= 0) return;
+
+        try {
+          const transaccionData = {
+            clienteId: clientId,
+            tipo: 'earned',
+            puntos: settings.welcomeBonusPoints,
+            descripcion: 'Bono de bienvenida',
+            referencia: 'welcome_bonus',
+            referenciaId: null,
+            fecha: new Date().toISOString(),
+            sucursalId: branchId,
+            recompensaId: null
+          };
+
+          const createdTransaccion = await transaccionesPuntosApi.create(transaccionData);
+
+          const newTransaction = {
+            id: createdTransaccion.id,
+            clientId: createdTransaccion.clienteId,
+            type: createdTransaccion.tipo,
+            points: createdTransaccion.puntos,
+            description: createdTransaccion.descripcion,
+            reference: createdTransaccion.referencia,
+            referenceId: createdTransaccion.referenciaId,
+            date: createdTransaccion.fecha,
+            branchId: createdTransaccion.sucursalId,
+            rewardId: createdTransaccion.recompensaId
+          };
+
+          set(state => ({
+            pointsTransactions: [...state.pointsTransactions, newTransaction]
+          }));
+
+          return settings.welcomeBonusPoints;
+        } catch (error) {
+          console.error('Error agregando bono de bienvenida:', error);
+          return 0;
+        }
+      },
+
+      /**
+       * MÉTODOS DE CONSULTA LOCAL (No requieren API)
+       */
       getAvailableRewards: () => {
         const { rewards } = get();
         return rewards.filter(reward => reward.isActive);
       },
 
-      // Obtener recompensas por categoría
       getRewardsByCategory: (category) => {
         const { rewards } = get();
         return rewards.filter(reward => reward.category === category && reward.isActive);
       },
 
-      // Obtener puntos de un cliente
       getClientPoints: (clientId) => {
         const { pointsTransactions } = get();
         return pointsTransactions
@@ -101,7 +538,6 @@ const useLoyaltyStore = create(
           .reduce((total, transaction) => total + transaction.points, 0);
       },
 
-      // Obtener historial de transacciones de un cliente
       getClientTransactions: (clientId) => {
         const { pointsTransactions } = get();
         return pointsTransactions
@@ -109,7 +545,6 @@ const useLoyaltyStore = create(
           .sort((a, b) => new Date(b.date) - new Date(a.date));
       },
 
-      // Obtener recompensas activas de un cliente
       getClientActiveRewards: (clientId) => {
         const { clientRewards, rewards } = get();
         const now = new Date();
@@ -126,7 +561,6 @@ const useLoyaltyStore = create(
           }));
       },
 
-      // Verificar si un cliente puede canjear una recompensa
       canRedeemReward: (clientId, rewardId) => {
         const { rewards, getClientPoints } = get();
         const reward = rewards.find(r => r.id === rewardId);
@@ -137,135 +571,19 @@ const useLoyaltyStore = create(
                clientPoints >= reward.pointsCost;
       },
 
-      // Agregar puntos por servicio
-      addPointsForService: (clientId, servicePrice, branchId, reference = null, referenceId = null) => {
-        const { settings, pointsTransactions } = get();
+      getClientLevel: (clientId) => {
+        const { loyaltyLevels, getClientPoints } = get();
+        const clientPoints = getClientPoints(clientId);
 
-        if (!settings.enabled) return;
+        // Encontrar el nivel apropiado basado en puntos
+        const level = loyaltyLevels
+          .sort((a, b) => a.minPoints - b.minPoints)
+          .reverse()
+          .find(level => clientPoints >= level.minPoints);
 
-        const pointsEarned = Math.floor(servicePrice * settings.pointsPerSol);
-
-        const newTransaction = {
-          id: Date.now(),
-          clientId,
-          type: 'earned',
-          points: pointsEarned,
-          description: `Puntos por servicio - S/${servicePrice}`,
-          reference: reference || 'service',
-          referenceId: referenceId || null,
-          date: new Date().toISOString(),
-          branchId
-        };
-
-        set(state => ({
-          pointsTransactions: [...state.pointsTransactions, newTransaction]
-        }));
-
-        return pointsEarned;
+        return level || loyaltyLevels[0];
       },
 
-      // Canjear recompensa
-      redeemReward: async (clientId, rewardId, branchId) => {
-        const { rewards, clientRewards, pointsTransactions, canRedeemReward } = get();
-
-        if (!canRedeemReward(clientId, rewardId)) {
-          throw new Error('No tienes suficientes puntos para esta recompensa');
-        }
-
-        const reward = rewards.find(r => r.id === rewardId);
-        const redemptionDate = new Date();
-        const expiryDate = new Date(redemptionDate.getTime() + (reward.validityDays * 24 * 60 * 60 * 1000));
-
-        // Generar código único
-        const discountCode = `${reward.name.replace(/\s+/g, '').toUpperCase()}-${clientId}-${Date.now().toString().slice(-3)}`;
-
-        // Crear registro de recompensa del cliente
-        const newClientReward = {
-          id: Date.now(),
-          clientId,
-          rewardId,
-          redeemDate: redemptionDate.toISOString(),
-          expiryDate: expiryDate.toISOString(),
-          status: 'active',
-          usedDate: null,
-          branchId,
-          discountCode
-        };
-
-        // Crear transacción de puntos negativos
-        const pointsTransaction = {
-          id: Date.now() + 1,
-          clientId,
-          type: 'redeemed',
-          points: -reward.pointsCost,
-          description: `Canje: ${reward.name}`,
-          reference: 'reward_redemption',
-          referenceId: rewardId,
-          date: redemptionDate.toISOString(),
-          branchId,
-          rewardId
-        };
-
-        set(state => ({
-          clientRewards: [...state.clientRewards, newClientReward],
-          pointsTransactions: [...state.pointsTransactions, pointsTransaction]
-        }));
-
-        return newClientReward;
-      },
-
-      // Usar recompensa
-      useReward: (clientRewardId) => {
-        set(state => ({
-          clientRewards: state.clientRewards.map(cr =>
-            cr.id === clientRewardId
-              ? { ...cr, status: 'used', usedDate: new Date().toISOString() }
-              : cr
-          )
-        }));
-      },
-
-      // Agregar recompensa (admin)
-      addReward: (rewardData) => {
-        const newReward = {
-          id: Date.now(),
-          ...rewardData,
-          isActive: true
-        };
-
-        set(state => ({
-          rewards: [...state.rewards, newReward]
-        }));
-
-        return newReward;
-      },
-
-      // Actualizar recompensa (admin)
-      updateReward: (rewardId, updates) => {
-        set(state => ({
-          rewards: state.rewards.map(reward =>
-            reward.id === rewardId ? { ...reward, ...updates } : reward
-          )
-        }));
-      },
-
-      // Eliminar recompensa (admin)
-      deleteReward: (rewardId) => {
-        set(state => ({
-          rewards: state.rewards.map(reward =>
-            reward.id === rewardId ? { ...reward, isActive: false } : reward
-          )
-        }));
-      },
-
-      // Actualizar configuraciones
-      updateSettings: (newSettings) => {
-        set(state => ({
-          settings: { ...state.settings, ...newSettings }
-        }));
-      },
-
-      // Obtener estadísticas de puntos
       getPointsStats: () => {
         const { pointsTransactions } = get();
 
@@ -284,7 +602,6 @@ const useLoyaltyStore = create(
         };
       },
 
-      // Obtener top clientes por puntos
       getTopClientsByPoints: (limit = 10) => {
         const { pointsTransactions } = get();
 
@@ -303,82 +620,6 @@ const useLoyaltyStore = create(
           .slice(0, limit);
       },
 
-      // Agregar puntos de bienvenida
-      addWelcomeBonus: (clientId, branchId) => {
-        const { settings, pointsTransactions } = get();
-
-        if (!settings.enabled || settings.welcomeBonusPoints <= 0) return;
-
-        const newTransaction = {
-          id: Date.now(),
-          clientId,
-          type: 'earned',
-          points: settings.welcomeBonusPoints,
-          description: 'Bono de bienvenida',
-          reference: 'welcome_bonus',
-          referenceId: null,
-          date: new Date().toISOString(),
-          branchId
-        };
-
-        set(state => ({
-          pointsTransactions: [...state.pointsTransactions, newTransaction]
-        }));
-
-        return settings.welcomeBonusPoints;
-      },
-
-      // Limpiar datos (para desarrollo)
-      clearData: () => {
-        set({
-          pointsTransactions: [],
-          clientRewards: []
-        });
-      },
-
-      // Funciones para gestión de niveles
-      getClientLevel: (clientId) => {
-        const { loyaltyLevels, getClientPoints } = get();
-        const clientPoints = getClientPoints(clientId);
-
-        // Encontrar el nivel apropiado basado en puntos
-        const level = loyaltyLevels
-          .sort((a, b) => a.minPoints - b.minPoints)
-          .reverse()
-          .find(level => clientPoints >= level.minPoints);
-
-        return level || loyaltyLevels[0];
-      },
-
-      updateLoyaltyLevel: (levelId, levelData) => {
-        set(state => ({
-          loyaltyLevels: state.loyaltyLevels.map(level =>
-            level.id === levelId ? { ...level, ...levelData } : level
-          )
-        }));
-      },
-
-      addLoyaltyLevel: (levelData) => {
-        const { loyaltyLevels } = get();
-        const newLevel = {
-          id: Date.now(),
-          ...levelData
-        };
-
-        set(state => ({
-          loyaltyLevels: [...state.loyaltyLevels, newLevel].sort((a, b) => a.minPoints - b.minPoints)
-        }));
-
-        return newLevel;
-      },
-
-      deleteLoyaltyLevel: (levelId) => {
-        set(state => ({
-          loyaltyLevels: state.loyaltyLevels.filter(level => level.id !== levelId)
-        }));
-      },
-
-      // Obtener clientes por nivel
       getClientsByLevel: () => {
         const { loyaltyLevels, pointsTransactions } = get();
 
@@ -414,21 +655,124 @@ const useLoyaltyStore = create(
         return clientsByLevel;
       },
 
-      // Inicializar datos mock si están vacíos
-      initializeMockData: () => {
-        const { pointsTransactions, clientRewards } = get();
+      /**
+       * CARGAR NIVELES DE LEALTAD - Fetch desde API
+       */
+      loadLoyaltyLevels: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const nivelesData = await nivelesLealtadApi.getAll();
 
-        if (pointsTransactions.length === 0 && clientRewards.length === 0) {
-          set({
-            pointsTransactions: mockData.pointsTransactions || [],
-            clientRewards: mockData.clientRewards || []
-          });
+          // Mapear estructura backend (español) a frontend (inglés)
+          const loyaltyLevels = nivelesData.map(nivel => ({
+            id: nivel.id,
+            name: nivel.nombre,
+            color: nivel.color,
+            image: nivel.image || null,
+            minPoints: nivel.minPoints,
+            maxPoints: nivel.maxPoints,
+            benefits: {
+              pointsMultiplier: nivel.beneficios.pointsMultiplier,
+              discountPercentage: nivel.beneficios.discountPercentage,
+              freeServicesPerMonth: nivel.beneficios.freeServicesPerMonth,
+              priorityBooking: nivel.beneficios.priorityBooking,
+              birthdayBonus: nivel.beneficios.birthdayBonus
+            }
+          }));
+
+          set({ loyaltyLevels, isLoading: false });
+          return { success: true };
+        } catch (error) {
+          console.error('Error cargando niveles de lealtad:', error);
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
         }
+      },
+
+      /**
+       * CARGAR CONFIGURACIÓN DE PUNTOS - Fetch desde API
+       */
+      loadLoyaltySettings: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const settingsData = await puntosSettingsApi.get();
+
+          // Mapear estructura (ya viene en formato correcto)
+          const settings = {
+            pointsPerSol: settingsData.puntosPerSol,
+            enabled: settingsData.enabled,
+            minimumPointsToRedeem: settingsData.minimumPointsToRedeem,
+            pointsExpiryDays: settingsData.pointsExpiryDays,
+            welcomeBonusPoints: settingsData.welcomeBonusPoints,
+            birthdayBonusPoints: settingsData.birthdayBonusPoints,
+            referralBonusPoints: settingsData.referralBonusPoints
+          };
+
+          set({ settings, isLoading: false });
+          return { success: true };
+        } catch (error) {
+          console.error('Error cargando configuración de puntos:', error);
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * GESTIÓN DE NIVELES DE LEALTAD (solo local - API no soporta PATCH en subarrays)
+       * NOTA: Para actualizar en backend, necesitaríamos endpoint personalizado
+       */
+      updateLoyaltyLevel: (levelId, levelData) => {
+        set(state => ({
+          loyaltyLevels: state.loyaltyLevels.map(level =>
+            level.id === levelId ? { ...level, ...levelData } : level
+          )
+        }));
+      },
+
+      addLoyaltyLevel: (levelData) => {
+        const { loyaltyLevels } = get();
+        const newLevel = {
+          id: Date.now(),
+          ...levelData
+        };
+
+        set(state => ({
+          loyaltyLevels: [...state.loyaltyLevels, newLevel].sort((a, b) => a.minPoints - b.minPoints)
+        }));
+
+        return newLevel;
+      },
+
+      deleteLoyaltyLevel: (levelId) => {
+        set(state => ({
+          loyaltyLevels: state.loyaltyLevels.filter(level => level.id !== levelId)
+        }));
+      },
+
+      /**
+       * ACTUALIZAR CONFIGURACIONES (solo local - API no soporta PATCH en subobjetos)
+       * NOTA: Para actualizar en backend, necesitaríamos endpoint personalizado
+       */
+      updateSettings: (newSettings) => {
+        set(state => ({
+          settings: { ...state.settings, ...newSettings }
+        }));
+      },
+
+      /**
+       * LIMPIAR DATOS (para desarrollo)
+       */
+      clearData: () => {
+        set({
+          pointsTransactions: [],
+          clientRewards: []
+        });
       }
     }),
     {
       name: 'loyalty-store',
       partialize: (state) => ({
+        // Persistir como cache
         rewards: state.rewards,
         pointsTransactions: state.pointsTransactions,
         clientRewards: state.clientRewards,

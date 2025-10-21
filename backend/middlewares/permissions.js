@@ -39,7 +39,25 @@ function permissionsMiddleware(req, res, next) {
     return next();
   }
 
-  // Verificar permiso
+  // EXCEPCIÓN: Permitir a clientes y barberos acceder a sus propios datos
+  // El middleware requireBranchAccess se encargará de filtrar automáticamente
+  const { roleSlug, userId } = req.auth;
+
+  if (req.method === 'GET') {
+    // Clientes pueden ver su propia info de clientes
+    if (roleSlug === 'client' && resource === 'clientes') {
+      console.log(`✅ [PERMS] Permiso especial: Cliente accediendo a su propia info`);
+      return next();
+    }
+
+    // Barberos pueden ver clientes y barberos (filtrado por backend)
+    if (roleSlug === 'barber' && (resource === 'clientes' || resource === 'barberos')) {
+      console.log(`✅ [PERMS] Permiso especial: Barbero accediendo a info filtrada`);
+      return next();
+    }
+  }
+
+  // Verificar permiso normal
   const hasPermission = req.auth.permissions.includes(requiredPermission);
 
   if (!hasPermission) {

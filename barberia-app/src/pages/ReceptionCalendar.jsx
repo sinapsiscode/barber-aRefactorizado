@@ -4,8 +4,8 @@ import { useAppointmentStore, useStaffStore, useFinancialStore } from '../stores
 import Swal from 'sweetalert2';
 
 const ReceptionCalendar = () => {
-  const { appointments, updateAppointment, loadMockAppointments } = useAppointmentStore();
-  const { barbers, loadMockStaff } = useStaffStore();
+  const { appointments, updateAppointment, loadMockData } = useAppointmentStore();
+  const { barbers, loadStaff } = useStaffStore();
   const { addTransaction } = useFinancialStore();
   
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -18,15 +18,15 @@ const ReceptionCalendar = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Cargar datos mock si no hay barberos o citas
+  // Cargar datos desde API si no hay barberos o citas
   useEffect(() => {
     if (!barbers || barbers.length === 0) {
-      loadMockStaff();
+      loadStaff();
     }
     if (!appointments || appointments.length === 0) {
-      loadMockAppointments();
+      loadMockData();
     }
-  }, [barbers, appointments, loadMockStaff, loadMockAppointments]);
+  }, [barbers, appointments, loadStaff, loadMockData]);
 
   // Servicios disponibles
   const services = [

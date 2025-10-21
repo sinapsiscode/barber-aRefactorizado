@@ -59,9 +59,9 @@ const MetricCard = ({
             </div>
           )}
           {description && (
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+            <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
               {description}
-            </p>
+            </div>
           )}
         </div>
         

@@ -40,7 +40,7 @@ const PREDEFINED_BACKGROUNDS = {
     id: 'barberTexture',
     name: 'Textura Barbería',
     type: 'image',
-    value: 'url("https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=100&h=100&fit=crop&crop=center") repeat, linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95))',
+    value: 'linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url("https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=100&h=100&fit=crop&crop=center")',
     preview: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=200&h=200&fit=crop',
     category: 'texture',
     allowedRoles: ['branch_admin', 'super_admin']
@@ -50,7 +50,7 @@ const PREDEFINED_BACKGROUNDS = {
     id: 'woodTexture',
     name: 'Madera Elegante',
     type: 'image',
-    value: 'url("https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=100&h=100&fit=crop") repeat, linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92))',
+    value: 'linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)), url("https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=100&h=100&fit=crop")',
     preview: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=200&h=200&fit=crop',
     category: 'texture',
     allowedRoles: ['branch_admin', 'super_admin']
@@ -60,7 +60,7 @@ const PREDEFINED_BACKGROUNDS = {
     id: 'marbleTexture',
     name: 'Mármol Premium',
     type: 'image',
-    value: 'url("https://images.unsplash.com/photo-1615873968403-89e068629265?w=100&h=100&fit=crop") repeat, linear-gradient(rgba(255,255,255,0.93), rgba(255,255,255,0.93))',
+    value: 'linear-gradient(rgba(255,255,255,0.93), rgba(255,255,255,0.93)), url("https://images.unsplash.com/photo-1615873968403-89e068629265?w=100&h=100&fit=crop")',
     preview: 'https://images.unsplash.com/photo-1615873968403-89e068629265?w=200&h=200&fit=crop',
     category: 'texture',
     allowedRoles: ['branch_admin', 'super_admin']
@@ -71,7 +71,7 @@ const PREDEFINED_BACKGROUNDS = {
     id: 'geometricPattern',
     name: 'Patrón Geométrico',
     type: 'pattern',
-    value: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffc000' fill-opacity='0.03'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat`,
+    value: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffc000' fill-opacity='0.03'%3E%3Cpath d='m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
     preview: 'linear-gradient(45deg, #ffc000, #ffffff)',
     category: 'pattern',
     allowedRoles: ['super_admin']
@@ -262,7 +262,7 @@ const useBackgroundStore = create(
               const backgroundData = {
                 name: `Imagen personalizada - ${file.name}`,
                 type: 'image',
-                value: `url("${base64}"), linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95))`,
+                value: `linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url("${base64}")`,
                 preview: base64,
                 category: 'custom',
                 allowedRoles: branchId ? ['branch_admin', 'super_admin'] : ['super_admin'],

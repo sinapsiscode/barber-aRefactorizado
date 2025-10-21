@@ -98,12 +98,13 @@ function requireUser(req, res, next) {
 /**
  * Middleware para verificar que el usuario pertenece a una sucursal específica
  * Útil para branch_admin que solo debe ver su sucursal
+ * También filtra automáticamente para barberos y clientes
  */
 function requireBranchAccess(req, res, next) {
-  const { roleSlug, sucursalId } = req.auth || {};
+  const { roleSlug, sucursalId, userId } = req.auth || {};
 
-  // Super admin puede acceder a todo
-  if (roleSlug === 'super_admin') {
+  // Super admin y recepción pueden acceder a todo
+  if (roleSlug === 'super_admin' || roleSlug === 'reception') {
     return next();
   }
 
@@ -134,6 +135,52 @@ function requireBranchAccess(req, res, next) {
       }
       // Forzar sucursal del usuario
       req.body.sucursalId = sucursalId;
+    }
+  }
+
+  // Filtrado automático para BARBEROS
+  if (roleSlug === 'barber' && userId) {
+    if (req.method === 'GET') {
+      const pathParts = req.path.split('/').filter(p => p);
+      const resource = pathParts[0];
+
+      // Para citas, filtrar por barberoId
+      if (resource === 'citas') {
+        req.query.barberoId = userId;
+      }
+      // Para portfolio, filtrar por barberoId
+      if (resource === 'portfolio') {
+        req.query.barberoId = userId;
+      }
+      // Para reviews, filtrar por barberoId
+      if (resource === 'reviews') {
+        req.query.barberoId = userId;
+      }
+    }
+  }
+
+  // Filtrado automático para CLIENTES
+  if (roleSlug === 'client' && userId) {
+    if (req.method === 'GET') {
+      const pathParts = req.path.split('/').filter(p => p);
+      const resource = pathParts[0];
+
+      // Para clientes, filtrar solo su propia información
+      if (resource === 'clientes') {
+        req.query.id = userId;
+      }
+      // Para citas, filtrar por clienteId
+      if (resource === 'citas') {
+        req.query.clienteId = userId;
+      }
+      // Para recompensas de cliente
+      if (resource === 'recompensasCliente') {
+        req.query.clienteId = userId;
+      }
+      // Para transacciones de puntos
+      if (resource === 'transaccionesPuntos') {
+        req.query.clienteId = userId;
+      }
     }
   }
 

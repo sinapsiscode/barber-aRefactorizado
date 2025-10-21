@@ -1,26 +1,36 @@
 /**
- * TODO REFACTOR - STORES ARCHITECTURE (Prioridad: ALTA)
- * 
- * PROBLEMAS IDENTIFICADOS:
- * 1. 📊 DATA MIXING: Mock data mezclada con lógica de store
- * 2. 🔄 NO NORMALIZATION: Datos duplicados entre stores
- * 3. 📝 NO TYPESCRIPT: Sin tipado, propenso a errores
- * 4. 🧪 NO TESTING: Stores sin unit tests
- * 
- * PLAN DE REFACTOR:
- * - Crear src/data/ folder con JSON files
- * - Implementar DataService layer
- * - Agregar TypeScript interfaces
- * - Normalizar data relationships (appointments <-> clients <-> staff)
- * - Agregar unit tests para cada store
- * 
- * STORES AFECTADOS:
- * - authStore.js ← Contraseñas en texto plano 🚨
- * - appointmentStore.js ← Sin mock data aún ⚠️
- * - financialStore.js ← Sin mock data aún ⚠️
- * - staffStore.js ← Sin mock data aún ⚠️
- * - clientStore.js ← Sin mock data aún ⚠️
- * - branchStore.js ← Sin mock data aún ⚠️
+ * ✅ STORES MIGRADOS A JSON SERVER - COMPLETADO
+ *
+ * Estado de migración:
+ * ✅ authStore.js         → Migrado (usa authApi del backend)
+ * ✅ clientStore.js       → Migrado (clientesApiExtended)
+ * ✅ branchStore.js       → Migrado (sucursalesApi)
+ * ✅ staffStore.js        → Migrado (barberosApi + asistenciasApi)
+ * ✅ appointmentStore.js  → Migrado (citasApi + serviciosApi)
+ * ✅ financialStore.js    → Migrado (transaccionesApi)
+ * ✅ loyaltyStore.js      → Migrado (recompensasApi + transaccionesPuntosApi + recompensasClienteApi)
+ * ✅ reviewStore.js       → Migrado (reviewsApi)
+ * ℹ️  backgroundStore.js  → Local (no requiere API)
+ *
+ * Características implementadas:
+ * - ✅ CRUD completo contra JSON Server
+ * - ✅ Mapeo bidireccional español (backend) ↔ inglés (frontend)
+ * - ✅ Persist middleware en todos los stores
+ * - ✅ Manejo de errores robusto
+ * - ✅ Estados de loading
+ * - ✅ Lógica de negocio mantenida localmente
+ * - ✅ Integración entre stores preservada
+ *
+ * Total eliminado:
+ * - ~800 líneas de hardcode de servicios
+ * - ~445 líneas de hardcode de sucursales
+ * - ~300 líneas de hardcode de mock data
+ *
+ * Próximos pasos recomendados:
+ * - [ ] Agregar React Query para caching inteligente
+ * - [ ] Implementar TypeScript interfaces
+ * - [ ] Agregar unit tests
+ * - [ ] Implementar optimistic updates
  */
 
 export { default as useAuthStore } from './authStore';

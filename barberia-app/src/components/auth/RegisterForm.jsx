@@ -24,14 +24,14 @@ const RegisterForm = ({ onBackToLogin }) => {
   const [isRegistering, setIsRegistering] = useState(false);
 
   const { register } = useAuthStore();
-  const { branches, loadMockBranches } = useBranchStore();
+  const { branches, loadBranches } = useBranchStore();
 
   // Cargar sedes al montar el componente
   useEffect(() => {
     if (!branches || branches.length === 0) {
-      loadMockBranches();
+      loadBranches();
     }
-  }, [branches, loadMockBranches]);
+  }, [branches, loadBranches]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

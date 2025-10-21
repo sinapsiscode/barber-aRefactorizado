@@ -6,11 +6,11 @@ import { MetricCard, CountryFlag } from '../common';
 import RewardsManagement from '../loyalty/RewardsManagement';
 
 const SuperAdminDashboard = () => {
-  const { branches, selectedBranch, loadMockBranches, getTotalStats, getCountryByCode } = useBranchStore();
-  const { loadMockTransactions, getFinancialSummary } = useFinancialStore();
-  const { loadMockAppointments, getAppointmentStats } = useAppointmentStore();
-  const { loadMockStaff, getStaffSummary } = useStaffStore();
-  const { loadMockClients, getClientStats } = useClientStore();
+  const { branches, selectedBranch, loadBranches, getTotalStats, getCountryByCode } = useBranchStore();
+  const { loadTransactions, getFinancialSummary } = useFinancialStore();
+  const { loadMockData, getAppointmentStats } = useAppointmentStore();
+  const { loadStaff, getStaffSummary } = useStaffStore();
+  const { loadClients, getClientStats } = useClientStore();
   const { getPointsStats } = useLoyaltyStore();
 
   const [showBranchForm, setShowBranchForm] = useState(false);
@@ -19,11 +19,11 @@ const SuperAdminDashboard = () => {
 
   useEffect(() => {
     if (branches.length === 0) {
-      loadMockBranches();
-      loadMockTransactions();
-      loadMockAppointments();
-      loadMockStaff();
-      loadMockClients();
+      loadBranches();
+      loadTransactions();
+      loadMockData();
+      loadStaff();
+      loadClients();
     }
   }, []);
 

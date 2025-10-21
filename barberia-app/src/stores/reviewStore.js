@@ -1,118 +1,197 @@
+/**
+ * REVIEW STORE - REFACTORIZADO CON JSON SERVER
+ *
+ * Cambios:
+ * ✅ Migrado a API real (reviewsApi)
+ * ✅ Eliminado hardcode de reviews mock
+ * ✅ CRUD completo para reviews
+ * ✅ Lógica de negocio (estadísticas, filtros) mantenida localmente
+ * ✅ Persist middleware ya existente
+ * ✅ Mapeo español ↔ inglés
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { reviewsApi } from '../services/api';
 
 const useReviewStore = create(
   persist(
     (set, get) => ({
       // Estado inicial
-      reviews: [
-        // Datos mock de reseñas
-        {
-          id: 1,
-          barberId: 1,
-          clientId: 1,
-          appointmentId: 1,
-          rating: 5,
-          comment: "Excelente servicio, Miguel es muy profesional y atento a los detalles. El corte quedó perfecto.",
-          serviceType: "Corte Clásico",
-          date: "2024-01-15",
-          clientName: "Juan Cliente",
-          isPublic: true,
-          response: null
-        },
-        {
-          id: 2,
-          barberId: 1,
-          clientId: 2,
-          appointmentId: 5,
-          rating: 4,
-          comment: "Buen servicio en general, aunque tuve que esperar un poco más de lo esperado.",
-          serviceType: "Fade Moderno",
-          date: "2024-01-14",
-          clientName: "Carlos Mendoza",
-          isPublic: true,
-          response: "Gracias por tu feedback, trabajamos constantemente en mejorar nuestros tiempos."
-        },
-        {
-          id: 3,
-          barberId: 2,
-          clientId: 3,
-          appointmentId: 8,
-          rating: 5,
-          comment: "Ana es increíble! El diseño de cejas quedó perfecto y el ambiente es muy relajante.",
-          serviceType: "Diseño de Cejas",
-          date: "2024-01-13",
-          clientName: "María González",
-          isPublic: true,
-          response: null
-        },
-        {
-          id: 4,
-          barberId: 1,
-          clientId: 4,
-          appointmentId: 12,
-          rating: 3,
-          comment: "El servicio estuvo bien, pero esperaba un poco más de innovación en el corte.",
-          serviceType: "Corte Clásico",
-          date: "2024-01-12",
-          clientName: "Pedro Sánchez",
-          isPublic: false,
-          response: null
-        },
-        {
-          id: 5,
-          barberId: 3,
-          clientId: 5,
-          appointmentId: 15,
-          rating: 5,
-          comment: "Roberto es un artista! El diseño especial superó todas mis expectativas.",
-          serviceType: "Diseño Especial",
-          date: "2024-01-11",
-          clientName: "Diego Torres",
-          isPublic: true,
-          response: "¡Muchas gracias! Nos encanta cuando nuestros clientes quedan satisfechos."
-        },
-        {
-          id: 6,
-          barberId: 2,
-          clientId: 6,
-          appointmentId: 18,
-          rating: 4,
-          comment: "Muy profesional y cuidadosa. El resultado fue exactamente lo que quería.",
-          serviceType: "Corte Femenino",
-          date: "2024-01-10",
-          clientName: "Sandra López",
-          isPublic: true,
-          response: null
-        },
-        {
-          id: 7,
-          barberId: 1,
-          clientId: 7,
-          appointmentId: 22,
-          rating: 2,
-          comment: "No quedé conforme con el corte, no siguió las indicaciones que le di.",
-          serviceType: "Fade Moderno",
-          date: "2024-01-09",
-          clientName: "Luis Ramírez",
-          isPublic: false,
-          response: "Lamentamos que no hayas quedado satisfecho. Te invitamos a regresar para corregir cualquier detalle."
-        },
-        {
-          id: 8,
-          barberId: 4,
-          clientId: 8,
-          appointmentId: 25,
-          rating: 5,
-          comment: "El mejor barbero de la ciudad! Siempre sabe exactamente qué necesito.",
-          serviceType: "Corte Clásico",
-          date: "2024-01-08",
-          clientName: "Fernando Vega",
-          isPublic: true,
-          response: null
-        }
-      ],
+      reviews: [],
       isLoading: false,
+      error: null,
+
+      /**
+       * CARGAR REVIEWS - Fetch desde API
+       */
+      loadReviews: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const reviewsData = await reviewsApi.getAll();
+
+          // Mapear estructura backend (español) a frontend (inglés)
+          const reviews = reviewsData.map(r => ({
+            id: r.id,
+            barberId: r.barberoId,
+            clientId: r.clienteId,
+            clientName: r.nombreCliente,
+            appointmentId: r.citaId,
+            rating: r.calificacion,
+            comment: r.comentario,
+            serviceType: r.tipoServicio,
+            date: r.fecha,
+            isPublic: r.esPublico,
+            response: r.respuesta,
+            responseDate: r.fechaRespuesta
+          }));
+
+          set({ reviews, isLoading: false });
+          return { success: true };
+        } catch (error) {
+          console.error('Error cargando reviews:', error);
+          set({ reviews: [], isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * AGREGAR REVIEW - POST a API
+       */
+      addReview: async (reviewData) => {
+        set({ isLoading: true, error: null });
+        try {
+          // Mapear a estructura backend
+          const reviewBackendData = {
+            barberoId: reviewData.barberId,
+            clienteId: reviewData.clientId,
+            nombreCliente: reviewData.clientName,
+            citaId: reviewData.appointmentId,
+            calificacion: reviewData.rating,
+            comentario: reviewData.comment,
+            tipoServicio: reviewData.serviceType,
+            fecha: new Date().toISOString().split('T')[0],
+            esPublico: true,
+            respuesta: null,
+            fechaRespuesta: null
+          };
+
+          const createdReview = await reviewsApi.create(reviewBackendData);
+
+          // Mapear de vuelta
+          const newReview = {
+            id: createdReview.id,
+            barberId: createdReview.barberoId,
+            clientId: createdReview.clienteId,
+            clientName: createdReview.nombreCliente,
+            appointmentId: createdReview.citaId,
+            rating: createdReview.calificacion,
+            comment: createdReview.comentario,
+            serviceType: createdReview.tipoServicio,
+            date: createdReview.fecha,
+            isPublic: createdReview.esPublico,
+            response: createdReview.respuesta,
+            responseDate: createdReview.fechaRespuesta
+          };
+
+          set(state => ({
+            reviews: [...state.reviews, newReview],
+            isLoading: false
+          }));
+
+          return { success: true, review: newReview };
+        } catch (error) {
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * AGREGAR RESPUESTA A REVIEW - PATCH a API
+       */
+      addResponse: async (reviewId, response) => {
+        set({ isLoading: true, error: null });
+        try {
+          const updatedReview = await reviewsApi.patch(reviewId, {
+            respuesta: response,
+            fechaRespuesta: new Date().toISOString()
+          });
+
+          set(state => ({
+            reviews: state.reviews.map(review =>
+              review.id === reviewId
+                ? {
+                    ...review,
+                    response: updatedReview.respuesta,
+                    responseDate: updatedReview.fechaRespuesta
+                  }
+                : review
+            ),
+            isLoading: false
+          }));
+
+          return { success: true };
+        } catch (error) {
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * CAMBIAR VISIBILIDAD DE REVIEW - PATCH a API
+       */
+      toggleReviewVisibility: async (reviewId) => {
+        set({ isLoading: true, error: null });
+        try {
+          const review = get().reviews.find(r => r.id === reviewId);
+          if (!review) {
+            set({ isLoading: false });
+            return { success: false, error: 'Review no encontrada' };
+          }
+
+          const updatedReview = await reviewsApi.patch(reviewId, {
+            esPublico: !review.isPublic
+          });
+
+          set(state => ({
+            reviews: state.reviews.map(r =>
+              r.id === reviewId
+                ? { ...r, isPublic: updatedReview.esPublico }
+                : r
+            ),
+            isLoading: false
+          }));
+
+          return { success: true };
+        } catch (error) {
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * ELIMINAR REVIEW - DELETE a API
+       */
+      deleteReview: async (reviewId) => {
+        set({ isLoading: true, error: null });
+        try {
+          await reviewsApi.delete(reviewId);
+
+          set(state => ({
+            reviews: state.reviews.filter(r => r.id !== reviewId),
+            isLoading: false
+          }));
+
+          return { success: true };
+        } catch (error) {
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * MÉTODOS DE CONSULTA LOCAL (No requieren API)
+       */
 
       // Obtener reseñas por barbero
       getReviewsByBarber: (barberId) => {
@@ -189,28 +268,6 @@ const useReviewStore = create(
         return filteredReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
       },
 
-      // Agregar respuesta a una reseña
-      addResponse: (reviewId, response) => {
-        set(state => ({
-          reviews: state.reviews.map(review =>
-            review.id === reviewId
-              ? { ...review, response, responseDate: new Date().toISOString() }
-              : review
-          )
-        }));
-      },
-
-      // Cambiar visibilidad de una reseña
-      toggleReviewVisibility: (reviewId) => {
-        set(state => ({
-          reviews: state.reviews.map(review =>
-            review.id === reviewId
-              ? { ...review, isPublic: !review.isPublic }
-              : review
-          )
-        }));
-      },
-
       // Obtener resumen general de todas las reseñas
       getOverallStats: () => {
         const { reviews } = get();
@@ -262,26 +319,34 @@ const useReviewStore = create(
         };
       },
 
-      // Agregar nueva reseña
-      addReview: (reviewData) => {
-        const newReview = {
-          id: Date.now(),
-          ...reviewData,
-          date: new Date().toISOString().split('T')[0],
-          isPublic: true,
-          response: null
-        };
+      /**
+       * OBTENER REVIEWS POR CLIENTE
+       */
+      getReviewsByClient: (clientId) => {
+        const { reviews } = get();
+        return reviews.filter(review => review.clientId === clientId);
+      },
 
-        set(state => ({
-          reviews: [...state.reviews, newReview]
-        }));
+      /**
+       * OBTENER REVIEWS POR CITA
+       */
+      getReviewByAppointment: (appointmentId) => {
+        const { reviews } = get();
+        return reviews.find(review => review.appointmentId === appointmentId);
+      },
 
-        return newReview;
+      /**
+       * VERIFICAR SI UNA CITA TIENE REVIEW
+       */
+      hasReview: (appointmentId) => {
+        const { reviews } = get();
+        return reviews.some(review => review.appointmentId === appointmentId);
       }
     }),
     {
       name: 'review-store',
       partialize: (state) => ({
+        // Persistir como cache
         reviews: state.reviews
       })
     }

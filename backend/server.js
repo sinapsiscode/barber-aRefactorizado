@@ -34,9 +34,16 @@ const DELAY = process.env.DELAY || 500; // Delay para simular latencia de red
 // MIDDLEWARES GLOBALES
 // ============================================
 
-// CORS - Permitir requests desde el frontend
+// CORS - Permitir requests desde el frontend (cualquier puerto de localhost)
 server.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (como Postman) y cualquier localhost
+    if (!origin || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-role-id', 'x-user-id', 'Authorization'],
   credentials: true
@@ -265,6 +272,70 @@ server.get('/estadisticas', authMiddleware, permissionsMiddleware, (req, res) =>
     success: true,
     data: stats
   });
+});
+
+/**
+ * Endpoint para obtener niveles de lealtad
+ * GET /configuracion/nivelesLealtad
+ */
+server.get('/configuracion/nivelesLealtad', authMiddleware, permissionsMiddleware, (req, res) => {
+  const db = router.db;
+  const configuracion = db.get('configuracion').value();
+
+  if (!configuracion || !configuracion.nivelesLealtad) {
+    return res.status(404).json({
+      success: false,
+      message: 'Niveles de lealtad no encontrados'
+    });
+  }
+
+  res.json(configuracion.nivelesLealtad);
+});
+
+/**
+ * Endpoint para obtener un nivel de lealtad específico
+ * GET /configuracion/nivelesLealtad/:id
+ */
+server.get('/configuracion/nivelesLealtad/:id', authMiddleware, permissionsMiddleware, (req, res) => {
+  const db = router.db;
+  const id = parseInt(req.params.id);
+  const configuracion = db.get('configuracion').value();
+
+  if (!configuracion || !configuracion.nivelesLealtad) {
+    return res.status(404).json({
+      success: false,
+      message: 'Niveles de lealtad no encontrados'
+    });
+  }
+
+  const nivel = configuracion.nivelesLealtad.find(n => n.id === id);
+
+  if (!nivel) {
+    return res.status(404).json({
+      success: false,
+      message: 'Nivel de lealtad no encontrado'
+    });
+  }
+
+  res.json(nivel);
+});
+
+/**
+ * Endpoint para obtener configuración de puntos
+ * GET /configuracion/puntosSettings
+ */
+server.get('/configuracion/puntosSettings', authMiddleware, permissionsMiddleware, (req, res) => {
+  const db = router.db;
+  const configuracion = db.get('configuracion').value();
+
+  if (!configuracion || !configuracion.puntosSettings) {
+    return res.status(404).json({
+      success: false,
+      message: 'Configuración de puntos no encontrada'
+    });
+  }
+
+  res.json(configuracion.puntosSettings);
 });
 
 // ============================================

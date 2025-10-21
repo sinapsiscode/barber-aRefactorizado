@@ -8,7 +8,19 @@
       "Bash(npm run build:*)",
       "Bash(cd:*)",
       "Bash(npm run dev:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(cat:*)",
+      "Bash(test:*)",
+      "Bash(mv:*)",
+      "Bash(npx eslint:*)",
+      "Bash(awk:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist)",
+      "Bash(curl:*)",
+      "Bash(xargs sed:*)",
+      "Bash(timeout:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

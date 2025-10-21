@@ -2,13 +2,13 @@
  * API Service Layer - Centraliza todas las llamadas HTTP al backend
  *
  * Configuración:
- * - Base URL: http://localhost:3001
+ * - Base URL: http://localhost:4341
  * - Backend con JSON Server + middlewares de autenticación
  * - Sistema de permisos por rol
  * - Headers de autenticación automáticos
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4341';
 
 /**
  * Clase de error personalizada para la API
@@ -195,6 +195,7 @@ export const authApi = {
           roleId: response.data.rol.id,
           roleName: response.data.rol.nombre,
           roleSlug: response.data.rol.slug,
+          role: response.data.rol.slug, // Agregar 'role' para compatibilidad con Dashboard
           permissions: response.data.rol.permisos,
         };
         localStorage.setItem('user', JSON.stringify(userData));
@@ -355,6 +356,76 @@ export const estadisticasApi = {
 };
 
 /**
+ * APIs para DATOS MAESTROS (configuración)
+ */
+
+// Métodos de Pago
+export const metodosPagoApi = createCrudApi('metodosPago');
+
+// Categorías de Ingresos
+export const categoriasIngresosApi = createCrudApi('categoriasIngresos');
+
+// Categorías de Gastos
+export const categoriasGastosApi = createCrudApi('categoriasGastos');
+
+// Precios por Sucursal
+export const preciosSucursalApi = createCrudApi('preciosSucursal');
+
+// API extendida para precios por sucursal
+export const preciosSucursalApiExtended = {
+  ...preciosSucursalApi,
+
+  // Obtener precio de un servicio en una sucursal
+  getByServiceAndBranch: async (servicioId, sucursalId) => {
+    const result = await apiRequest(`/preciosSucursal?servicioId=${servicioId}&sucursalId=${sucursalId}`);
+    return result[0] || null; // Retornar el primer resultado o null
+  },
+
+  // Obtener todos los precios de una sucursal
+  getByBranch: (sucursalId) => {
+    return apiRequest(`/preciosSucursal?sucursalId=${sucursalId}`);
+  },
+
+  // Obtener todos los precios de un servicio
+  getByService: (servicioId) => {
+    return apiRequest(`/preciosSucursal?servicioId=${servicioId}`);
+  },
+};
+
+/**
+ * API para Configuración de Lealtad
+ * (datos anidados en db.json bajo "configuracion")
+ */
+
+// Niveles de Lealtad
+export const nivelesLealtadApi = {
+  // Obtener todos los niveles
+  getAll: () => {
+    return apiRequest('/configuracion/nivelesLealtad');
+  },
+
+  // Obtener un nivel por ID
+  getById: (id) => {
+    return apiRequest(`/configuracion/nivelesLealtad/${id}`);
+  },
+
+  // Actualizar un nivel (PATCH al objeto completo de configuracion)
+  // Nota: JSON Server no soporta PATCH en subarrays, necesitaríamos endpoint custom
+  // Por ahora usaremos GET + modificación local + PUT completo
+};
+
+// Settings de Puntos
+export const puntosSettingsApi = {
+  // Obtener configuración de puntos
+  get: () => {
+    return apiRequest('/configuracion/puntosSettings');
+  },
+
+  // Actualizar configuración de puntos
+  // Nota: Similar a niveles, necesitaría endpoint custom o PATCH del objeto configuracion completo
+};
+
+/**
  * Health check del servidor
  */
 export const healthCheck = async () => {
@@ -392,6 +463,14 @@ export default {
   roles: rolesApiExtended,
   modulos: modulosApiExtended,
   estadisticas: estadisticasApi,
+
+  // Datos Maestros
+  metodosPago: metodosPagoApi,
+  categoriasIngresos: categoriasIngresosApi,
+  categoriasGastos: categoriasGastosApi,
+  preciosSucursal: preciosSucursalApiExtended,
+  nivelesLealtad: nivelesLealtadApi,
+  puntosSettings: puntosSettingsApi,
 
   // Auth
   auth: authApi,

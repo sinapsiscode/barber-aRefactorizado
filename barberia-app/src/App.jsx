@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuthStore, useBranchStore, useClientStore, useStaffStore, useFinancialStore, useAppointmentStore } from './stores';
+import { useAuthStore, useBranchStore, useClientStore, useStaffStore, useFinancialStore, useAppointmentStore, useLoyaltyStore } from './stores';
 import { useReminders } from './hooks/useReminders';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Layout from './components/common/Layout';
@@ -36,17 +36,35 @@ import PublicBooking from './pages/PublicBooking';
  */
 
 function App() {
-  const { isAuthenticated, user } = useAuthStore();
-  const { loadMockBranches } = useBranchStore();
-  const { loadMockClients } = useClientStore();
-  const { loadMockStaff } = useStaffStore();
+  const { isAuthenticated, user, logout } = useAuthStore();
+  const { loadBranches } = useBranchStore();
+  const { loadClients } = useClientStore();
+  const { loadStaff } = useStaffStore();
   const { loadMockData: loadFinancialData } = useFinancialStore();
   const { loadMockData: loadAppointmentData } = useAppointmentStore();
+  const { loadLoyaltyLevels, loadLoyaltySettings } = useLoyaltyStore();
   // TODO REFACTOR: Reemplazar con React Router
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [showLoginFromLanding, setShowLoginFromLanding] = useState(false);
   const [showPublicBooking, setShowPublicBooking] = useState(false);
-  
+
+  // 🔧 FIX: Validar y limpiar datos antiguos de localStorage incompatibles con backend
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // Si el usuario no tiene el campo 'role' o 'roleSlug', es un dato antiguo
+      if (!user.role && !user.roleSlug) {
+        console.warn('⚠️ Datos de usuario antiguos detectados. Limpiando localStorage...');
+        logout();
+        // Limpiar todos los stores persistidos
+        const keysToRemove = Object.keys(localStorage).filter(key =>
+          key.includes('-storage') || key === 'user'
+        );
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        window.location.reload();
+      }
+    }
+  }, [isAuthenticated, user]);
+
   // Sistema de recordatorios automático
   useReminders();
 
@@ -66,25 +84,61 @@ function App() {
     setShowLoginFromLanding(false);
   };
 
-  // Cargar datos mock al inicializar la app - REFACTORED: desde JSON
+  // Cargar datos SOLO si el usuario está autenticado
   useEffect(() => {
+    // ✅ FIX: Solo cargar datos si hay usuario autenticado
+    if (!isAuthenticated || !user) {
+      console.log('⏭️ Esperando login para cargar datos...');
+      return;
+    }
+
     const initializeData = async () => {
       try {
-        await Promise.all([
-          loadMockBranches(),
-          loadMockClients(),
-          loadMockStaff(),
-          loadFinancialData(),
-          loadAppointmentData()
-        ]);
-        console.log('✅ Datos cargados desde JSON exitosamente');
+        console.log('📡 Cargando datos desde API...');
+
+        // Datos que TODOS los roles necesitan
+        const commonDataPromises = [
+          loadBranches(),
+          loadAppointmentData(),
+          loadLoyaltyLevels(),
+          loadLoyaltySettings()
+        ];
+
+        // Datos adicionales según rol
+        const roleSpecificPromises = [];
+
+        // Solo admins y recepción cargan lista completa de clientes y staff
+        if (['super_admin', 'branch_admin', 'reception'].includes(user.role)) {
+          roleSpecificPromises.push(loadClients());
+          roleSpecificPromises.push(loadStaff());
+        }
+
+        // Solo admins cargan datos financieros
+        if (['super_admin', 'branch_admin'].includes(user.role)) {
+          roleSpecificPromises.push(loadFinancialData());
+        }
+
+        // Barberos cargan solo su información de staff y datos de clientes (filtrados por backend)
+        if (user.role === 'barber') {
+          roleSpecificPromises.push(loadStaff());
+          roleSpecificPromises.push(loadClients()); // Necesario para ver info de clientes en citas
+        }
+
+        // Clientes cargan su propia información y barberos disponibles
+        if (user.role === 'client') {
+          roleSpecificPromises.push(loadClients()); // Backend filtrará solo su info
+          roleSpecificPromises.push(loadStaff()); // Para ver barberos disponibles
+        }
+
+        await Promise.all([...commonDataPromises, ...roleSpecificPromises]);
+        console.log('✅ Datos cargados desde JSON Server exitosamente');
       } catch (error) {
         console.error('❌ Error inicializando datos:', error);
       }
     };
-    
+
     initializeData();
-  }, [loadMockBranches, loadMockClients, loadMockStaff, loadFinancialData, loadAppointmentData]);
+  }, [isAuthenticated, user, loadBranches, loadClients, loadStaff, loadFinancialData, loadAppointmentData, loadLoyaltyLevels, loadLoyaltySettings]);
 
   // TODO REFACTOR: Reemplazar con <Routes><Route></Routes>
   const renderPage = () => {

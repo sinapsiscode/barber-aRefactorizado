@@ -151,7 +151,7 @@ const permissionsMap = {
 
   // CONFIGURACIÓN
   'configuracion': {
-    'GET': 'ver_reportes',
+    'GET': 'ver_recompensas', // Clientes pueden ver configuración de lealtad
     'PUT': 'gestionar_permisos',
     'PATCH': 'gestionar_permisos'
   }

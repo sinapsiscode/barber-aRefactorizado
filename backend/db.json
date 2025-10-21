@@ -101,13 +101,15 @@
       "slug": "barber",
       "descripcion": "Ve sus citas y gestiona su portfolio",
       "permisos": [
-        "ver_citas_propias",
-        "editar_cita_propia",
+        "ver_citas",
+        "editar_cita",
         "ver_portfolio",
         "crear_portfolio",
-        "editar_portfolio_propio",
-        "ver_reviews_propias",
-        "responder_review"
+        "editar_portfolio",
+        "ver_reviews",
+        "responder_review",
+        "ver_barberos",
+        "ver_clientes"
       ]
     },
     {
@@ -116,14 +118,15 @@
       "slug": "client",
       "descripcion": "Gestiona sus propias citas y ve su información",
       "permisos": [
-        "ver_citas_propias",
-        "crear_cita_propia",
-        "editar_cita_propia",
-        "eliminar_cita_propia",
+        "ver_citas",
+        "crear_cita",
+        "editar_cita",
+        "eliminar_cita",
         "ver_portfolio",
         "ver_recompensas",
         "canjear_recompensa",
-        "crear_review"
+        "crear_review",
+        "ver_barberos"
       ]
     }
   ],
@@ -494,6 +497,28 @@
       "ultimaVisita": "2025-09-27T10:52:45.321Z",
       "createdAt": "2024-10-12T18:16:09.090Z",
       "updatedAt": "2025-10-07T22:00:20.420Z"
+    },
+    {
+      "id": 51,
+      "nombre": "Juan Cliente",
+      "email": "cliente@barberia.com",
+      "telefono": "999-888-777",
+      "fechaNacimiento": "1990-01-15",
+      "direccion": "Av. Principal 123, Lima",
+      "sucursalPreferida": 1,
+      "barberoPreferido": 1,
+      "puntosLealtad": 150,
+      "totalVisitas": 8,
+      "totalGastado": 450,
+      "serviciosPreferidos": [
+        "Corte Clásico",
+        "Barba"
+      ],
+      "notas": "Cliente demo para pruebas del sistema",
+      "estado": "active",
+      "ultimaVisita": "2025-10-18T10:00:00.000Z",
+      "createdAt": "2025-10-01T10:00:00.000Z",
+      "updatedAt": "2025-10-18T10:00:00.000Z"
     },
     {
       "id": 2,
@@ -1540,6 +1565,26 @@
       "ultimaVisita": "2025-10-01T00:28:16.643Z",
       "createdAt": "2024-04-01T11:09:01.883Z",
       "updatedAt": "2025-10-07T22:00:20.429Z"
+    },
+    {
+      "nombre": "Juan Cliente",
+      "email": "cliente@barberia.com",
+      "telefono": "999-888-777",
+      "fechaNacimiento": "1990-01-15",
+      "direccion": "Av. Principal 123",
+      "sucursalPreferida": 1,
+      "barberoPreferido": 1,
+      "puntosLealtad": 100,
+      "totalVisitas": 5,
+      "totalGastado": 250,
+      "serviciosPreferidos": [
+        "Corte Cl�sico"
+      ],
+      "estado": "active",
+      "ultimaVisita": "2025-10-15T10:00:00.000Z",
+      "createdAt": "2025-10-01T10:00:00.000Z",
+      "updatedAt": "2025-10-15T10:00:00.000Z",
+      "id": 51
     }
   ],
   "barberos": [
@@ -5251,6 +5296,125 @@
   "portfolio": [],
   "reviews": [],
   "asistencias": [],
+  "metodosPago": [
+    {
+      "id": "efectivo",
+      "nombre": "Efectivo",
+      "activo": true,
+      "icono": "💵",
+      "descripcion": "Pago en efectivo"
+    },
+    {
+      "id": "tarjeta",
+      "nombre": "Tarjeta",
+      "activo": true,
+      "icono": "💳",
+      "descripcion": "Tarjeta de débito o crédito"
+    },
+    {
+      "id": "yape",
+      "nombre": "Yape",
+      "activo": true,
+      "icono": "📱",
+      "descripcion": "Pago mediante Yape"
+    },
+    {
+      "id": "plin",
+      "nombre": "Plin",
+      "activo": true,
+      "icono": "📱",
+      "descripcion": "Pago mediante Plin"
+    },
+    {
+      "id": "transferencia",
+      "nombre": "Transferencia",
+      "activo": true,
+      "icono": "🏦",
+      "descripcion": "Transferencia bancaria"
+    }
+  ],
+  "categoriasIngresos": [
+    {
+      "id": "services",
+      "nombre": "Servicios",
+      "icono": "✂️",
+      "color": "#10b981",
+      "descripcion": "Ingresos por servicios de barbería"
+    },
+    {
+      "id": "products",
+      "nombre": "Productos",
+      "icono": "🛍️",
+      "color": "#3b82f6",
+      "descripcion": "Venta de productos"
+    },
+    {
+      "id": "tips",
+      "nombre": "Propinas",
+      "icono": "💰",
+      "color": "#f59e0b",
+      "descripcion": "Propinas recibidas"
+    },
+    {
+      "id": "otros",
+      "nombre": "Otros",
+      "icono": "📊",
+      "color": "#6366f1",
+      "descripcion": "Otros ingresos"
+    }
+  ],
+  "categoriasGastos": [
+    {
+      "id": "salaries",
+      "nombre": "Salarios",
+      "icono": "👥",
+      "color": "#ef4444",
+      "descripcion": "Pago de salarios al personal"
+    },
+    {
+      "id": "supplies",
+      "nombre": "Insumos",
+      "icono": "📦",
+      "color": "#8b5cf6",
+      "descripcion": "Compra de insumos y materiales"
+    },
+    {
+      "id": "rent",
+      "nombre": "Alquiler",
+      "icono": "🏠",
+      "color": "#ec4899",
+      "descripcion": "Pago de alquiler del local"
+    },
+    {
+      "id": "utilities",
+      "nombre": "Servicios",
+      "icono": "⚡",
+      "color": "#f97316",
+      "descripcion": "Servicios básicos (luz, agua, internet)"
+    },
+    {
+      "id": "maintenance",
+      "nombre": "Mantenimiento",
+      "icono": "🔧",
+      "color": "#14b8a6",
+      "descripcion": "Mantenimiento y reparaciones"
+    },
+    {
+      "id": "marketing",
+      "nombre": "Marketing",
+      "icono": "📢",
+      "color": "#f43f5e",
+      "descripcion": "Gastos en publicidad y marketing"
+    },
+    {
+      "id": "otros",
+      "nombre": "Otros",
+      "icono": "📊",
+      "color": "#64748b",
+      "descripcion": "Otros gastos"
+    }
+  ],
+  "preciosSucursal": [],
   "configuracion": {
     "puntosSettings": {
       "puntosPerSol": 1,
