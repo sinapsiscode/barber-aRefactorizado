@@ -171,23 +171,31 @@ export const buildWhatsAppMessage = ({
 }) => {
   const servicesList = [
     ...selectedServices.map(s => s.name),
-    ...(otherService && otherServiceText ? [`OTROS: ${otherServiceText}`] : [])
+    ...(otherService && otherServiceText ? [otherServiceText] : [])
   ].join(', ');
 
-  return `*NUEVA RESERVA DE BARBERÍA*\n\n` +
-    `👤 *Cliente:* ${formData.nombre} ${formData.apellido}\n` +
-    `📱 *DNI:* ${formData.dni}\n` +
-    `📧 *Correo:* ${formData.correo}\n` +
-    `📞 *Teléfono:* ${formData.telefono}\n` +
-    `📍 *Distrito:* ${formData.distrito}\n\n` +
-    `📅 *Fecha:* ${formatSelectedDate(selectedDate)}\n` +
-    `⏰ *Hora:* ${selectedTime}\n` +
-    `✂️ *Servicios:* ${servicesList}\n` +
-    `⏱️ *Duración total:* ${totalDuration} minutos\n\n` +
-    `💰 *Total a pagar:* S/ ${totalPrice}\n` +
-    `💵 *Adelanto (50%):* S/ ${totalPrice / 2}\n\n` +
-    `✅ El cliente ha aceptado los términos y condiciones.\n\n` +
-    `_Enviado desde el sistema de reservas online_`;
+  const formatDate = selectedDate.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+
+  // Mensaje ultra-simplificado sin caracteres especiales problemáticos
+  const lines = [
+    'RESERVA CONFIRMADA',
+    '',
+    `Cliente: ${formData.nombre} ${formData.apellido}`,
+    `Telefono: ${formData.telefono}`,
+    `Fecha: ${formatDate}`,
+    `Hora: ${selectedTime}`,
+    '',
+    `Servicio: ${servicesList}`,
+    `Total: S/${totalPrice}`,
+    `Adelanto 50porciento: S/${totalPrice / 2}`,
+    `Duracion: ${totalDuration} min`
+  ];
+
+  return lines.join('\n');
 };
 
 /**
@@ -196,7 +204,17 @@ export const buildWhatsAppMessage = ({
  * @returns {string} URL de WhatsApp
  */
 export const buildWhatsAppUrl = (message) => {
-  const encodedMessage = encodeURIComponent(message);
+  // Limpiar el mensaje agresivamente para evitar error 429
+  const cleanMessage = message
+    .replace(/[*]/g, '') // Remover asteriscos
+    .replace(/[^\wáéíóúÁÉÍÓÚñÑ\s\n\-\/\:\.\,S]/gi, '') // Solo caracteres básicos
+    .replace(/\s+/g, ' ') // Normalizar espacios
+    .trim()
+    .substring(0, 500); // Limitar a 500 caracteres
+
+  // Codificar para URL
+  const encodedMessage = encodeURIComponent(cleanMessage);
+
   return `https://wa.me/${WHATSAPP_CONFIG.number}?text=${encodedMessage}`;
 };
 

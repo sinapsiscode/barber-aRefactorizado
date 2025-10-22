@@ -2,6 +2,7 @@ import { PAYMENT_METHODS, WHATSAPP_CONFIG } from '../../constants/appointmentFor
 
 /**
  * Generar mensaje de WhatsApp para confirmación de cita
+ * Versión ultra-simplificada para evitar error 429 de WhatsApp
  */
 export const generateWhatsAppMessage = (appointmentData, services, selectedBranch) => {
   const selectedServicesNames = services
@@ -10,42 +11,56 @@ export const generateWhatsAppMessage = (appointmentData, services, selectedBranc
     .join(', ');
 
   const formatDate = new Date(appointmentData.date).toLocaleDateString('es-ES', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
   });
 
-  return `🗓️ *NUEVA RESERVA DE CITA*
+  // Mensaje ultra-corto sin caracteres especiales problemáticos
+  const lines = [
+    'RESERVA CONFIRMADA',
+    '',
+    `Cliente: ${appointmentData.clientName}`,
+    `Fecha: ${formatDate}`,
+    `Hora: ${appointmentData.time}`,
+    `Barbero: ${appointmentData.barberName}`,
+    `Sede: ${selectedBranch?.name || ''}`,
+    '',
+    `Servicio: ${selectedServicesNames}`,
+    `Total: S/${appointmentData.totalPrice}`,
+    `Duracion: ${appointmentData.duration} min`,
+  ];
 
-👤 *Cliente:* ${appointmentData.clientName}
-📅 *Fecha:* ${formatDate}
-⏰ *Hora:* ${appointmentData.time}
-✂️ *Barbero:* ${appointmentData.barberName}
-🏢 *Sede:* ${selectedBranch?.name}
-📍 *Dirección:* ${selectedBranch?.address}
-
-🎯 *Servicios:*
-${selectedServicesNames}
-
-💰 *Total:* S/${appointmentData.totalPrice}
-⏱️ *Duración:* ${appointmentData.duration} min
-
-${appointmentData.paymentMethod === PAYMENT_METHODS.CASH
-    ? '✅ *Pago:* En efectivo al llegar'
-    : `💳 *Pago:* ${appointmentData.paymentMethod.toUpperCase()} - Voucher #${appointmentData.voucherNumber}`
+  // Agregar pago solo si no es efectivo
+  if (appointmentData.paymentMethod !== PAYMENT_METHODS.CASH) {
+    lines.push(`Pago: ${appointmentData.paymentMethod.toUpperCase()} ${appointmentData.voucherNumber}`);
   }
 
-${appointmentData.notes ? `📝 *Notas:* ${appointmentData.notes}` : ''}
+  // Agregar notas solo si existen y son cortas
+  if (appointmentData.notes && appointmentData.notes.length < 50) {
+    lines.push(`Nota: ${appointmentData.notes}`);
+  }
 
-_Mensaje generado automáticamente por el sistema de reservas_`;
+  return lines.filter(line => line !== undefined).join('\n');
 };
 
 /**
  * Generar URL de WhatsApp
+ * Limpia caracteres especiales y limita longitud para evitar error 429
  */
 export const generateWhatsAppUrl = (message) => {
-  return `https://wa.me/${WHATSAPP_CONFIG.PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+  // Limpiar el mensaje agresivamente
+  const cleanMessage = message
+    .replace(/[*]/g, '') // Remover asteriscos (negritas de WhatsApp)
+    .replace(/[^\wáéíóúÁÉÍÓÚñÑ\s\n\-\/\:\.\,S]/gi, '') // Solo caracteres alfanuméricos y básicos
+    .replace(/\s+/g, ' ') // Normalizar espacios
+    .trim()
+    .substring(0, 500); // Limitar a 500 caracteres máximo
+
+  // Codificar para URL
+  const encodedMessage = encodeURIComponent(cleanMessage);
+
+  return `https://wa.me/${WHATSAPP_CONFIG.PHONE_NUMBER}?text=${encodedMessage}`;
 };
 
 /**

@@ -52,9 +52,16 @@ const PaymentMethod = ({
             <h4 className="font-medium text-gray-900">Información del pago</h4>
             <FormInput
               label="Número de operación"
+              type="text"
               value={voucherNumber}
-              onChange={(e) => onVoucherNumberChange(e.target.value)}
+              onChange={(e) => {
+                // Solo permitir números
+                const value = e.target.value.replace(/\D/g, '');
+                onVoucherNumberChange(value);
+              }}
               placeholder="Ej: 123456789"
+              pattern="[0-9]*"
+              inputMode="numeric"
               required
             />
             <div>

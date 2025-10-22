@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { FiSave } from 'react-icons/fi';
+import { FiSave, FiCheck, FiLoader } from 'react-icons/fi';
 import { useAuthStore } from '../stores';
 import { useProfileSettings } from '../hooks/settings/useProfileSettings';
 import { useNotificationSettings } from '../hooks/settings/useNotificationSettings';
@@ -29,7 +29,9 @@ const Settings = () => {
     handleAvatarUpload,
     updateFormData,
     handleSave,
-    loadBranches
+    loadBranches,
+    isSaving,
+    saveSuccess
   } = useProfileSettings();
 
   const {
@@ -137,13 +139,36 @@ const Settings = () => {
 
             {/* Save Button */}
             {(activeTab === 'profile' || activeTab === 'notifications' || activeTab === 'preferences') && (
-              <div className="mt-8 flex justify-end">
+              <div className="mt-8 flex justify-end items-center space-x-3">
+                {saveSuccess && (
+                  <div className="flex items-center space-x-2 text-green-600 dark:text-green-400 animate-fadeIn">
+                    <FiCheck className="h-5 w-5" />
+                    <span className="text-sm font-medium">Cambios guardados exitosamente</span>
+                  </div>
+                )}
                 <button
                   onClick={handleSave}
-                  className="btn-primary flex items-center space-x-2"
+                  disabled={isSaving}
+                  className={`btn-primary flex items-center space-x-2 min-w-[180px] justify-center transition-all ${
+                    isSaving ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg'
+                  }`}
                 >
-                  <FiSave className="h-4 w-4" />
-                  <span>Guardar Cambios</span>
+                  {isSaving ? (
+                    <>
+                      <FiLoader className="h-4 w-4 animate-spin" />
+                      <span>Guardando...</span>
+                    </>
+                  ) : saveSuccess ? (
+                    <>
+                      <FiCheck className="h-4 w-4" />
+                      <span>Guardado</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiSave className="h-4 w-4" />
+                      <span>Guardar Cambios</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}

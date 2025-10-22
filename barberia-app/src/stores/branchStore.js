@@ -30,36 +30,19 @@ const useBranchStore = create(
       loadBranches: async () => {
         set({ isLoading: true, error: null });
         try {
-          const sucursales = await sucursalesApi.getAll();
+          const branches = await sucursalesApi.getAll();
 
-          // Mapear estructura backend (español) a frontend (inglés)
-          const branches = sucursales.map(s => ({
-            id: s.id,
-            name: s.nombre,
-            city: s.ciudad,
-            country: s.pais,
-            address: s.direccion,
-            phone: s.telefono,
-            email: s.email,
-            manager: s.encargado,
-            managerPhone: s.telefonoEncargado,
-            coordinates: s.coordenadas || { lat: 0, lng: 0 },
-            workingHours: s.horarios || {},
-            services: s.servicios || [],
-            amenities: s.amenidades || [],
-            status: s.activo ? 'active' : 'inactive',
-            stats: s.estadisticas || {
-              totalAppointments: 0,
-              monthlyRevenue: 0,
-              staffCount: 0,
-              clientCount: 0
-            },
-            images: s.imagenes || [],
-            createdAt: s.createdAt,
-            updatedAt: s.updatedAt
+          // db.json ya está en inglés, no necesita mapeo
+          // Solo convertir IDs de string a number si es necesario
+          const processedBranches = branches.map(b => ({
+            ...b,
+            id: typeof b.id === 'string' ? parseInt(b.id) : b.id,
+            capacity: typeof b.capacity === 'string' ? parseInt(b.capacity) : b.capacity,
+            openTime: b.openTime || '08:00',
+            closeTime: b.closeTime || '22:00'
           }));
 
-          set({ branches, isLoading: false });
+          set({ branches: processedBranches, isLoading: false });
           return { success: true };
         } catch (error) {
           console.error('Error cargando sucursales:', error);
@@ -74,62 +57,28 @@ const useBranchStore = create(
       addBranch: async (branchData) => {
         set({ isLoading: true, error: null });
         try {
-          // Mapear estructura frontend (inglés) a backend (español)
-          const sucursalData = {
-            nombre: branchData.name,
-            ciudad: branchData.city,
-            pais: branchData.country,
-            direccion: branchData.address,
-            telefono: branchData.phone,
-            email: branchData.email,
-            encargado: branchData.manager,
-            telefonoEncargado: branchData.managerPhone,
-            coordenadas: branchData.coordinates || { lat: 0, lng: 0 },
-            horarios: branchData.workingHours || {},
-            servicios: branchData.services || [],
-            amenidades: branchData.amenities || [],
-            activo: true,
-            estadisticas: {
+          // db.json ya está en inglés, no necesita mapeo
+          const newBranchData = {
+            ...branchData,
+            isActive: true,
+            stats: {
               totalAppointments: 0,
               monthlyRevenue: 0,
               staffCount: 0,
               clientCount: 0
             },
-            imagenes: branchData.images || [],
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };
 
-          const createdSucursal = await sucursalesApi.create(sucursalData);
-
-          // Mapear de vuelta a frontend
-          const newBranch = {
-            id: createdSucursal.id,
-            name: createdSucursal.nombre,
-            city: createdSucursal.ciudad,
-            country: createdSucursal.pais,
-            address: createdSucursal.direccion,
-            phone: createdSucursal.telefono,
-            email: createdSucursal.email,
-            manager: createdSucursal.encargado,
-            managerPhone: createdSucursal.telefonoEncargado,
-            coordinates: createdSucursal.coordenadas,
-            workingHours: createdSucursal.horarios,
-            services: createdSucursal.servicios,
-            amenities: createdSucursal.amenidades,
-            status: createdSucursal.activo ? 'active' : 'inactive',
-            stats: createdSucursal.estadisticas,
-            images: createdSucursal.imagenes,
-            createdAt: createdSucursal.createdAt,
-            updatedAt: createdSucursal.updatedAt
-          };
+          const createdBranch = await sucursalesApi.create(newBranchData);
 
           set(state => ({
-            branches: [...state.branches, newBranch],
+            branches: [...state.branches, createdBranch],
             isLoading: false
           }));
 
-          return { success: true, branch: newBranch };
+          return { success: true, branch: createdBranch };
         } catch (error) {
           set({ isLoading: false, error: error.message });
           return { success: false, error: error.message };
@@ -142,49 +91,13 @@ const useBranchStore = create(
       updateBranch: async (id, updates) => {
         set({ isLoading: true, error: null });
         try {
-          // Mapear updates a estructura backend
-          const sucursalUpdates = {};
-          if (updates.name) sucursalUpdates.nombre = updates.name;
-          if (updates.city) sucursalUpdates.ciudad = updates.city;
-          if (updates.country) sucursalUpdates.pais = updates.country;
-          if (updates.address) sucursalUpdates.direccion = updates.address;
-          if (updates.phone) sucursalUpdates.telefono = updates.phone;
-          if (updates.email) sucursalUpdates.email = updates.email;
-          if (updates.manager) sucursalUpdates.encargado = updates.manager;
-          if (updates.managerPhone) sucursalUpdates.telefonoEncargado = updates.managerPhone;
-          if (updates.coordinates) sucursalUpdates.coordenadas = updates.coordinates;
-          if (updates.workingHours) sucursalUpdates.horarios = updates.workingHours;
-          if (updates.services) sucursalUpdates.servicios = updates.services;
-          if (updates.amenities) sucursalUpdates.amenidades = updates.amenities;
-          if (updates.status) sucursalUpdates.activo = updates.status === 'active';
-          if (updates.stats) sucursalUpdates.estadisticas = updates.stats;
-          if (updates.images) sucursalUpdates.imagenes = updates.images;
-
-          sucursalUpdates.updatedAt = new Date().toISOString();
-
-          const updatedSucursal = await sucursalesApi.patch(id, sucursalUpdates);
-
-          // Mapear de vuelta
-          const updatedBranch = {
-            id: updatedSucursal.id,
-            name: updatedSucursal.nombre,
-            city: updatedSucursal.ciudad,
-            country: updatedSucursal.pais,
-            address: updatedSucursal.direccion,
-            phone: updatedSucursal.telefono,
-            email: updatedSucursal.email,
-            manager: updatedSucursal.encargado,
-            managerPhone: updatedSucursal.telefonoEncargado,
-            coordinates: updatedSucursal.coordenadas,
-            workingHours: updatedSucursal.horarios,
-            services: updatedSucursal.servicios,
-            amenities: updatedSucursal.amenidades,
-            status: updatedSucursal.activo ? 'active' : 'inactive',
-            stats: updatedSucursal.estadisticas,
-            images: updatedSucursal.imagenes,
-            createdAt: updatedSucursal.createdAt,
-            updatedAt: updatedSucursal.updatedAt
+          // db.json ya está en inglés, no necesita mapeo
+          const updatesWithTimestamp = {
+            ...updates,
+            updatedAt: new Date().toISOString()
           };
+
+          const updatedBranch = await sucursalesApi.patch(id, updatesWithTimestamp);
 
           set(state => ({
             branches: state.branches.map(branch =>

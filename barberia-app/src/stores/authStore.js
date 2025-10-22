@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { authApi } from '../services/api.js';
+import { authApi, usuariosApi } from '../services/api.js';
 
 /**
  * AuthStore - Migrado a backend real
@@ -211,12 +211,23 @@ const useAuthStore = create(
 
       /**
        * Actualizar perfil del usuario actual
-       * TODO: Implementar cuando se agregue endpoint de actualización
+       * Actualiza tanto el estado local como el backend
        */
-      updateUserProfile: (profileData) => {
+      updateUserProfile: async (profileData) => {
         const { user } = get();
-        if (user) {
-          set({ user: { ...user, ...profileData } });
+        if (!user) return;
+
+        try {
+          // Actualizar en el backend usando PATCH
+          const updatedUser = await usuariosApi.patch(user.id, profileData);
+
+          // Actualizar estado local
+          set({ user: { ...user, ...updatedUser } });
+
+          return { success: true, user: updatedUser };
+        } catch (error) {
+          console.error('Error actualizando perfil:', error);
+          return { success: false, error: error.message };
         }
       },
 

@@ -27,7 +27,7 @@ import UserProfile from '../header/UserProfile';
  * - Control de modo demo
  * - Perfil de usuario
  */
-const Header = ({ onToggleSidebar }) => {
+const Header = ({ onToggleSidebar, onPageChange }) => {
   const { user } = useAuthStore();
   const { themeMode, toggleTheme } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
@@ -146,7 +146,7 @@ const Header = ({ onToggleSidebar }) => {
 
           {/* User Profile - hide on very small screens */}
           <div className="hidden sm:block flex-shrink-0">
-            <UserProfile user={user} />
+            <UserProfile user={user} onPageChange={onPageChange} />
           </div>
         </div>
       </div>

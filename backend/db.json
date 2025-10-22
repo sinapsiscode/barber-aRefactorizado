@@ -4046,6 +4046,26 @@
       "recordatorioEnviado": true,
       "createdAt": "2024-11-17T11:26:22.241Z",
       "updatedAt": "2025-10-07T22:00:20.435Z"
+    },
+    {
+      "clienteId": 51,
+      "nombreCliente": "Juan Cliente",
+      "barberoId": 4,
+      "nombreBarbero": "Marlon Ryan",
+      "sucursalId": 1,
+      "fecha": "2025-10-23",
+      "hora": "09:30",
+      "servicios": [
+        4
+      ],
+      "precioTotal": 40,
+      "duracion": 50,
+      "estado": "pending_payment",
+      "notas": "asdasdfasf",
+      "recordatorioEnviado": false,
+      "createdAt": "2025-10-22T01:00:41.391Z",
+      "updatedAt": "2025-10-22T01:00:41.391Z",
+      "id": 101
     }
   ],
   "servicios": [

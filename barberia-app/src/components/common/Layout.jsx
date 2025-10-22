@@ -75,6 +75,7 @@ const Layout = ({ children, currentPage, onPageChange }) => {
                 setIsSidebarCollapsed(!isSidebarCollapsed);
               }
             }}
+            onPageChange={onPageChange}
           />
 
           {/* Main content - responsive padding */}
