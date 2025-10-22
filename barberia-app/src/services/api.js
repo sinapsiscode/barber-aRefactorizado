@@ -8,7 +8,7 @@
  * - Headers de autenticación automáticos
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4341';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 /**
  * Clase de error personalizada para la API
@@ -161,21 +161,22 @@ const createCrudApi = (resource) => ({
 /**
  * API para cada recurso (nombres en español según backend)
  */
-export const usuariosApi = createCrudApi('usuarios');
-export const clientesApi = createCrudApi('clientes');
-export const sucursalesApi = createCrudApi('sucursales');
-export const barberosApi = createCrudApi('barberos');
-export const serviciosApi = createCrudApi('servicios');
-export const citasApi = createCrudApi('citas');
-export const recompensasApi = createCrudApi('recompensas');
-export const transaccionesPuntosApi = createCrudApi('transaccionesPuntos');
-export const recompensasClienteApi = createCrudApi('recompensasCliente');
+// ✅ FIXED: Cambiado a inglés para coincidir con db.json
+export const usuariosApi = createCrudApi('users');
+export const clientesApi = createCrudApi('clients');
+export const sucursalesApi = createCrudApi('branches');
+export const barberosApi = createCrudApi('barbers');
+export const serviciosApi = createCrudApi('services');
+export const citasApi = createCrudApi('appointments');
+export const recompensasApi = createCrudApi('loyaltyRewards');
+export const transaccionesPuntosApi = createCrudApi('pointsTransactions');
+export const recompensasClienteApi = createCrudApi('clientRewards');
 export const portfolioApi = createCrudApi('portfolio');
-export const transaccionesApi = createCrudApi('transacciones');
-export const asistenciasApi = createCrudApi('asistencias');
+export const transaccionesApi = createCrudApi('transactions');
+export const asistenciasApi = createCrudApi('attendance');
 export const reviewsApi = createCrudApi('reviews');
 export const rolesApi = createCrudApi('roles');
-export const modulosApi = createCrudApi('modulos');
+export const modulosApi = createCrudApi('modules');
 
 /**
  * API de autenticación (usa endpoint personalizado del backend)
@@ -254,15 +255,15 @@ export const clientesApiExtended = {
   ...clientesApi,
 
   getByBranch: (branchId) => {
-    return apiRequest(`/clientes?sucursalPreferida=${branchId}`);
+    return apiRequest(`/clients?preferredBranch=${branchId}`);
   },
 
   getActive: () => {
-    return apiRequest(`/clientes?estado=active`);
+    return apiRequest(`/clients?status=active`);
   },
 
   search: (query) => {
-    return apiRequest(`/clientes?nombre_like=${query}`);
+    return apiRequest(`/clients?name_like=${query}`);
   },
 };
 
@@ -273,11 +274,11 @@ export const barberosApiExtended = {
   ...barberosApi,
 
   getByBranch: (branchId) => {
-    return apiRequest(`/barberos?sucursalId=${branchId}`);
+    return apiRequest(`/barbers?branchId=${branchId}`);
   },
 
   getActive: () => {
-    return apiRequest(`/barberos?estado=active`);
+    return apiRequest(`/barbers?status=active`);
   },
 };
 
@@ -288,23 +289,23 @@ export const citasApiExtended = {
   ...citasApi,
 
   getByDate: (date) => {
-    return apiRequest(`/citas?fecha=${date}`);
+    return apiRequest(`/appointments?date=${date}`);
   },
 
   getByBarber: (barberId) => {
-    return apiRequest(`/citas?barberoId=${barberId}`);
+    return apiRequest(`/appointments?barberId=${barberId}`);
   },
 
   getByClient: (clientId) => {
-    return apiRequest(`/citas?clienteId=${clientId}`);
+    return apiRequest(`/appointments?clientId=${clientId}`);
   },
 
   getByBranch: (branchId) => {
-    return apiRequest(`/citas?sucursalId=${branchId}`);
+    return apiRequest(`/appointments?branchId=${branchId}`);
   },
 
   getByStatus: (status) => {
-    return apiRequest(`/citas?estado=${status}`);
+    return apiRequest(`/appointments?status=${status}`);
   },
 };
 
@@ -315,15 +316,15 @@ export const portfolioApiExtended = {
   ...portfolioApi,
 
   getByCategory: (category) => {
-    return apiRequest(`/portfolio?categoria=${category}`);
+    return apiRequest(`/portfolio?category=${category}`);
   },
 
   getByBarber: (barberId) => {
-    return apiRequest(`/portfolio?barberoId=${barberId}`);
+    return apiRequest(`/portfolio?barberId=${barberId}`);
   },
 
   getByBranch: (branchId) => {
-    return apiRequest(`/portfolio?sucursalId=${branchId}`);
+    return apiRequest(`/portfolio?branchId=${branchId}`);
   },
 };
 

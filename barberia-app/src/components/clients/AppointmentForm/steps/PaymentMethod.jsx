@@ -40,14 +40,9 @@ const PaymentMethod = ({
                 value={method.id}
                 checked={selectedMethod === method.id}
                 onChange={(e) => onMethodChange(e.target.value)}
-                className="w-4 h-4 text-primary-600"
+                className="w-4 h-4 text-primary-600 flex-shrink-0"
               />
-              <div className="flex items-center ml-3">
-                {method.icon && (
-                  <img src={method.icon} alt={method.name} className="w-8 h-8 mr-3" />
-                )}
-                <span className="font-medium">{method.name}</span>
-              </div>
+              <span className="ml-3 font-medium">{method.name}</span>
             </label>
           ))}
         </div>

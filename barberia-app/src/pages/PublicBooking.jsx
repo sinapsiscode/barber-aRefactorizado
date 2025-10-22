@@ -2,6 +2,7 @@ import { usePublicCalendar } from '../hooks/publicBooking/usePublicCalendar';
 import { useServiceSelection } from '../hooks/publicBooking/useServiceSelection';
 import { usePublicBookingForm } from '../hooks/publicBooking/usePublicBookingForm';
 import { usePublicBookingSteps } from '../hooks/publicBooking/usePublicBookingSteps';
+import { usePublicData } from '../hooks/publicBooking/usePublicData';
 import PublicBookingHeader from '../components/publicBooking/PublicBookingHeader';
 import PublicCalendarStep from '../components/publicBooking/PublicCalendarStep';
 import PublicFormStep from '../components/publicBooking/PublicFormStep';
@@ -14,8 +15,12 @@ import { BOOKING_STEPS } from '../constants/publicBooking';
  * Wizard de 2 pasos:
  * 1. Selección de fecha y hora
  * 2. Formulario de información del cliente y servicios
+ *
+ * ✅ FIXED: Carga de barberos para reservas públicas
  */
 const PublicBooking = ({ onBackToLanding }) => {
+  // Hook para cargar datos públicos (barberos y sucursales)
+  const { barbers, branches, isLoading: loadingPublicData } = usePublicData();
   // Hook de calendario (navegación, selección de fecha/hora)
   const {
     currentDate,
@@ -72,6 +77,21 @@ const PublicBooking = ({ onBackToLanding }) => {
     resetForm,
     resetServices
   });
+
+  // Mostrar loading mientras se cargan los datos públicos
+  if (loadingPublicData) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-4xl w-full p-8">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="text-gray-600">Cargando información...</p>
+            <p className="text-sm text-gray-500">Obteniendo barberos y sucursales disponibles</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
