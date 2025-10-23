@@ -1585,6 +1585,27 @@
       "createdAt": "2025-10-01T10:00:00.000Z",
       "updatedAt": "2025-10-15T10:00:00.000Z",
       "id": 51
+    },
+    {
+      "nombre": "GIANPIERRE",
+      "email": "pier_Terrazas@hotmail.com",
+      "telefono": "961178234",
+      "fechaNacimiento": "1999-03-12",
+      "direccion": "afafasfaf",
+      "sucursalPreferida": 6,
+      "puntosLealtad": 0,
+      "totalVisitas": 0,
+      "totalGastado": 0,
+      "serviciosPreferidos": [],
+      "notas": "safsadfafasfaf",
+      "estado": "active",
+      "ultimaVisita": null,
+      "intervaloAvisoCorte": 15,
+      "fechaUltimoAviso": null,
+      "avisoHabilitado": true,
+      "createdAt": "2025-10-23T20:17:03.010Z",
+      "updatedAt": "2025-10-23T20:17:03.010Z",
+      "id": 52
     }
   ],
   "barberos": [
