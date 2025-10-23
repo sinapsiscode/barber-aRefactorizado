@@ -6,11 +6,12 @@
  */
 
 import { useState, useEffect } from 'react';
-import { FiSave, FiRefreshCw, FiDollarSign, FiTrendingUp, FiAlertCircle, FiCheck } from 'react-icons/fi';
+import { FiSave, FiRefreshCw, FiDollarSign, FiTrendingUp, FiAlertCircle, FiCheck, FiX } from 'react-icons/fi';
 import { useAppointmentStore, useBranchStore, useAuthStore } from '../../stores';
 import Swal from 'sweetalert2';
 
-const ServicePricingManager = () => {
+const ServicePricingManager = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
   const { user } = useAuthStore();
   const { selectedBranch } = useBranchStore();
   const { 
@@ -158,7 +159,26 @@ const ServicePricingManager = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      {/* Overlay */}
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-y-auto">
+          {/* Botón de cerrar */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors"
+          >
+            <FiX className="h-5 w-5" />
+          </button>
+
+          {/* Contenido */}
+          <div className="p-6 space-y-6">
       {/* Header y Estadísticas */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between mb-4">
@@ -375,6 +395,9 @@ const ServicePricingManager = () => {
               <li>• Los precios se aplicarán inmediatamente después de guardar</li>
               <li>• Puedes resetear a precios base en cualquier momento</li>
             </ul>
+          </div>
+        </div>
+      </div>
           </div>
         </div>
       </div>

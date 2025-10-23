@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Read(//c/Users/usu/Documents/barber-aRefactorizado/barberia-app/**)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(cat:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

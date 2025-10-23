@@ -1,6 +1,0 @@
-{
-  "port": 3001,
-  "host": "localhost",
-  "delay": 500,
-  "static": "./public"
-}
