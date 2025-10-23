@@ -27,8 +27,8 @@ const middlewares = jsonServer.defaults({
 });
 
 // Configuración
-const PORT = process.env.PORT || 3001;
-const DELAY = process.env.DELAY || 500; // Delay para simular latencia de red
+const PORT = process.env.PORT;
+const DELAY = process.env.DELAY;
 
 // ============================================
 // MIDDLEWARES GLOBALES
@@ -75,7 +75,7 @@ server.get('/health', (req, res) => {
     status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV
   });
 });
 

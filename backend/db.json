@@ -1999,6 +1999,80 @@
       "capacidad": 3,
       "activa": true,
       "createdAt": "2025-10-07T22:00:20.417Z"
+    },
+    {
+      "name": "CUZCO PRIME",
+      "city": "CUSCO",
+      "country": "AR",
+      "address": "SANTA CATALINA",
+      "phone": "971232233",
+      "email": "asf@gmail.com",
+      "manager": "Ana",
+      "managerPhone": "987654332",
+      "services": [
+        "asf",
+        "asfaf",
+        "asfa",
+        "asfa",
+        "fafa",
+        "fa",
+        "sf",
+        "asf",
+        "a",
+        "faf"
+      ],
+      "amenities": [
+        "asfasfafaf",
+        "asfafa",
+        "afasfas",
+        "faf",
+        "asfafsafas",
+        "ff"
+      ],
+      "workingHours": {
+        "monday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "tuesday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "wednesday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "thursday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "friday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "saturday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "sunday": {
+          "open": "08:00",
+          "close": "22:00"
+        }
+      },
+      "coordinates": {
+        "lat": 0,
+        "lng": 0
+      },
+      "isActive": true,
+      "stats": {
+        "totalAppointments": 0,
+        "monthlyRevenue": 0,
+        "staffCount": 0,
+        "clientCount": 0
+      },
+      "createdAt": "2025-10-23T20:14:09.514Z",
+      "updatedAt": "2025-10-23T20:14:09.514Z",
+      "id": 6
     }
   ],
   "citas": [
@@ -4066,6 +4140,26 @@
       "createdAt": "2025-10-22T01:00:41.391Z",
       "updatedAt": "2025-10-22T01:00:41.391Z",
       "id": 101
+    },
+    {
+      "clienteId": "3",
+      "nombreCliente": "Samuel O'Hara",
+      "barberoId": "6",
+      "nombreBarbero": "Mrs. Lois Morar-Jerde",
+      "sucursalId": 1,
+      "fecha": "2025-10-23",
+      "hora": "09:00",
+      "servicios": [
+        1
+      ],
+      "precioTotal": 25,
+      "duracion": 30,
+      "estado": "pending",
+      "notas": "",
+      "recordatorioEnviado": false,
+      "createdAt": "2025-10-23T20:12:31.298Z",
+      "updatedAt": "2025-10-23T20:12:31.298Z",
+      "id": 102
     }
   ],
   "servicios": [
