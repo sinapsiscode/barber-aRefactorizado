@@ -3036,11 +3036,11 @@
       ],
       "precioTotal": 65,
       "duracion": 80,
-      "estado": "confirmed",
+      "estado": "completed",
       "notas": "Suppono valde nesciunt est.",
       "recordatorioEnviado": true,
       "createdAt": "2025-02-12T23:57:37.386Z",
-      "updatedAt": "2025-10-07T22:00:20.435Z"
+      "updatedAt": "2025-10-23T17:56:57.841Z"
     },
     {
       "id": 52,

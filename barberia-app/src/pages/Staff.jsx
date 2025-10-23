@@ -1,5 +1,5 @@
 import { FiPlus, FiCalendar } from 'react-icons/fi';
-import { useAuthStore, useBranchStore } from '../stores';
+import { useAuthStore, useBranchStore, useAppointmentStore } from '../stores';
 import { DataTable } from '../components/common';
 import BranchRestrictionNotice from '../components/common/BranchRestrictionNotice';
 import StaffForm from '../components/staff/StaffForm';
@@ -16,6 +16,7 @@ import useBranchFilter from '../hooks/useBranchFilter';
 const Staff = () => {
   const { user } = useAuthStore();
   const { selectedBranch, branches } = useBranchStore();
+  const { appointments = [], services = [] } = useAppointmentStore();
   const {
     getBranchTitle,
     getBranchDescription
@@ -48,6 +49,8 @@ const Staff = () => {
   // Configurar columnas de la tabla
   const columns = getTableColumns({
     branches,
+    appointments,
+    services,
     expandedServicesBarber,
     setExpandedServicesBarber,
     setSelectedBarber,

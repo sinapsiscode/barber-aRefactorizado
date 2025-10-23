@@ -34,7 +34,7 @@ const permissionsMap = {
 
   // BARBEROS / PERSONAL
   'barberos': {
-    'GET': 'ver_barberos',
+    'GET': null, // Público - cualquiera puede ver barberos
     'POST': 'crear_barbero',
     'PUT': 'editar_barbero',
     'PATCH': 'editar_barbero',
@@ -52,7 +52,7 @@ const permissionsMap = {
 
   // SUCURSALES
   'sucursales': {
-    'GET': 'ver_sucursales',
+    'GET': null, // Público - cualquiera puede ver sucursales
     'POST': 'crear_sucursal',
     'PUT': 'editar_sucursal',
     'PATCH': 'editar_sucursal',
@@ -70,7 +70,7 @@ const permissionsMap = {
 
   // SERVICIOS
   'servicios': {
-    'GET': 'ver_portfolio', // Todos pueden ver
+    'GET': null, // Público - todos pueden ver servicios
     'POST': 'crear_portfolio',
     'PUT': 'editar_portfolio',
     'PATCH': 'editar_portfolio',
@@ -79,7 +79,7 @@ const permissionsMap = {
 
   // PORTFOLIO
   'portfolio': {
-    'GET': 'ver_portfolio',
+    'GET': null, // Público - todos pueden ver portfolio
     'POST': 'crear_portfolio',
     'PUT': 'editar_portfolio',
     'PATCH': 'editar_portfolio',
@@ -115,7 +115,7 @@ const permissionsMap = {
 
   // REVIEWS
   'reviews': {
-    'GET': 'ver_reviews',
+    'GET': null, // Público - todos pueden ver reviews
     'POST': 'crear_review',
     'PUT': 'responder_review',
     'PATCH': 'responder_review',
@@ -124,11 +124,11 @@ const permissionsMap = {
 
   // ASISTENCIAS
   'asistencias': {
-    'GET': 'ver_barberos',
-    'POST': 'crear_barbero',
+    'GET': 'ver_barberos', // Reutilizamos permiso de barberos (la asistencia es de barberos)
+    'POST': 'editar_barbero',
     'PUT': 'editar_barbero',
     'PATCH': 'editar_barbero',
-    'DELETE': 'eliminar_barbero'
+    'DELETE': 'editar_barbero'
   },
 
   // ROLES (solo lectura para algunos, gestión para admin)
@@ -151,9 +151,45 @@ const permissionsMap = {
 
   // CONFIGURACIÓN
   'configuracion': {
-    'GET': 'ver_recompensas', // Clientes pueden ver configuración de lealtad
+    'GET': null, // Público - clientes pueden ver configuración de lealtad
     'PUT': 'gestionar_permisos',
     'PATCH': 'gestionar_permisos'
+  },
+
+  // PRECIOS POR SUCURSAL
+  'preciosSucursal': {
+    'GET': 'ver_sucursales', // Ver precios de servicios por sucursal
+    'POST': 'editar_sucursal',
+    'PUT': 'editar_sucursal',
+    'PATCH': 'editar_sucursal',
+    'DELETE': 'editar_sucursal'
+  },
+
+  // MÉTODOS DE PAGO
+  'metodosPago': {
+    'GET': null, // Público - todos pueden ver métodos de pago
+    'POST': 'gestionar_permisos',
+    'PUT': 'gestionar_permisos',
+    'PATCH': 'gestionar_permisos',
+    'DELETE': 'gestionar_permisos'
+  },
+
+  // CATEGORÍAS DE INGRESOS
+  'categoriasIngresos': {
+    'GET': 'ver_transacciones',
+    'POST': 'gestionar_permisos',
+    'PUT': 'gestionar_permisos',
+    'PATCH': 'gestionar_permisos',
+    'DELETE': 'gestionar_permisos'
+  },
+
+  // CATEGORÍAS DE GASTOS
+  'categoriasGastos': {
+    'GET': 'ver_transacciones',
+    'POST': 'gestionar_permisos',
+    'PUT': 'gestionar_permisos',
+    'PATCH': 'gestionar_permisos',
+    'DELETE': 'gestionar_permisos'
   }
 };
 
@@ -181,7 +217,8 @@ const publicRoutes = [
   '/register',
   '/portfolio', // Portfolio público (solo GET)
   '/servicios', // Servicios públicos (solo GET)
-  '/sucursales' // Sucursales públicas para vista landing (solo GET)
+  '/sucursales', // Sucursales públicas para vista landing (solo GET)
+  '/barberos' // Barberos públicos para vista landing (solo GET)
 ];
 
 /**

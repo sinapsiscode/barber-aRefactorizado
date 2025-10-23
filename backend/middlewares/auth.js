@@ -28,6 +28,11 @@ function loadDatabase() {
  * Middleware de autenticación
  */
 function authMiddleware(req, res, next) {
+  // Saltar autenticación para OPTIONS (CORS preflight)
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   // Saltar autenticación para rutas públicas
   if (isPublicRoute(req.path, req.method)) {
     return next();
@@ -144,17 +149,17 @@ function requireBranchAccess(req, res, next) {
       const pathParts = req.path.split('/').filter(p => p);
       const resource = pathParts[0];
 
-      // Para citas, filtrar por barberoId
+      // Para citas, filtrar por barberId
       if (resource === 'citas') {
-        req.query.barberoId = userId;
+        req.query.barberId = userId;
       }
-      // Para portfolio, filtrar por barberoId
+      // Para portfolio, filtrar por barberId
       if (resource === 'portfolio') {
-        req.query.barberoId = userId;
+        req.query.barberId = userId;
       }
-      // Para reviews, filtrar por barberoId
+      // Para reviews, filtrar por barberId
       if (resource === 'reviews') {
-        req.query.barberoId = userId;
+        req.query.barberId = userId;
       }
     }
   }
@@ -175,17 +180,17 @@ function requireBranchAccess(req, res, next) {
           console.log(`🔍 [AUTH] Filtrando clientes por email: ${user.email}`);
         }
       }
-      // Para citas, filtrar por clienteId
+      // Para citas, filtrar por clientId
       if (resource === 'citas') {
-        req.query.clienteId = userId;
+        req.query.clientId = userId;
       }
       // Para recompensas de cliente
       if (resource === 'recompensasCliente') {
-        req.query.clienteId = userId;
+        req.query.clientId = userId;
       }
       // Para transacciones de puntos
       if (resource === 'transaccionesPuntos') {
-        req.query.clienteId = userId;
+        req.query.clientId = userId;
       }
     }
   }

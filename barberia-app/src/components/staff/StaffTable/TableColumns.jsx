@@ -9,6 +9,8 @@ import { getServicesPerformedByBarber } from '../../../utils/staff/servicesAnaly
  *
  * @param {Object} params
  * @param {Array} params.branches - Lista de sucursales
+ * @param {Array} params.appointments - Lista de citas
+ * @param {Array} params.services - Lista de servicios
  * @param {string} params.expandedServicesBarber - ID del barbero con dropdown expandido
  * @param {Function} params.setExpandedServicesBarber - Setter para barbero expandido
  * @param {Function} params.setSelectedBarber - Setter para barbero seleccionado
@@ -18,6 +20,8 @@ import { getServicesPerformedByBarber } from '../../../utils/staff/servicesAnaly
  */
 export const getTableColumns = ({
   branches,
+  appointments = [],
+  services = [],
   expandedServicesBarber,
   setExpandedServicesBarber,
   setSelectedBarber,
@@ -114,7 +118,7 @@ export const getTableColumns = ({
     key: 'servicesPerformed',
     label: 'Servicios Realizados',
     render: (value, barber) => {
-      const servicesData = getServicesPerformedByBarber(barber.id);
+      const servicesData = getServicesPerformedByBarber(barber.id, appointments, services);
       const isExpanded = expandedServicesBarber === barber.id;
 
       return (

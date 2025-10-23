@@ -7,6 +7,15 @@
  * @returns {Object} Datos de servicios realizados
  */
 export const getServicesPerformedByBarber = (barberId, appointments, services) => {
+  // Validación defensiva: si appointments o services son undefined, retornar objeto vacío
+  if (!appointments || !services) {
+    return {
+      services: [],
+      totalServices: 0,
+      totalRevenue: 0
+    };
+  }
+
   const barberAppointments = appointments.filter(apt =>
     apt.barberId === barberId && apt.status === 'completed'
   );

@@ -159,24 +159,24 @@ const createCrudApi = (resource) => ({
 });
 
 /**
- * API para cada recurso (nombres en español según backend)
+ * API para cada recurso (nombres en ESPAÑOL según db.json)
  */
-// ✅ FIXED: Cambiado a inglés para coincidir con db.json
-export const usuariosApi = createCrudApi('users');
-export const clientesApi = createCrudApi('clients');
-export const sucursalesApi = createCrudApi('branches');
-export const barberosApi = createCrudApi('barbers');
-export const serviciosApi = createCrudApi('services');
-export const citasApi = createCrudApi('appointments');
-export const recompensasApi = createCrudApi('loyaltyRewards');
-export const transaccionesPuntosApi = createCrudApi('pointsTransactions');
-export const recompensasClienteApi = createCrudApi('clientRewards');
+// ✅ FIXED: Usando nombres en español que coinciden con db.json
+export const usuariosApi = createCrudApi('usuarios');
+export const clientesApi = createCrudApi('clientes');
+export const sucursalesApi = createCrudApi('sucursales');
+export const barberosApi = createCrudApi('barberos');
+export const serviciosApi = createCrudApi('servicios');
+export const citasApi = createCrudApi('citas');
+export const recompensasApi = createCrudApi('recompensas');
+export const transaccionesPuntosApi = createCrudApi('transaccionesPuntos');
+export const recompensasClienteApi = createCrudApi('recompensasCliente');
 export const portfolioApi = createCrudApi('portfolio');
-export const transaccionesApi = createCrudApi('transactions');
-export const asistenciasApi = createCrudApi('attendance');
+export const transaccionesApi = createCrudApi('transacciones');
+export const asistenciasApi = createCrudApi('asistencias');
 export const reviewsApi = createCrudApi('reviews');
 export const rolesApi = createCrudApi('roles');
-export const modulosApi = createCrudApi('modules');
+export const modulosApi = createCrudApi('modulos');
 
 /**
  * API de autenticación (usa endpoint personalizado del backend)

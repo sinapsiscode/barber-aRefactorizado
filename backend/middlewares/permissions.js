@@ -11,6 +11,11 @@ const { getRequiredPermission, isPublicRoute } = require('../utils/permissions-m
  * Middleware principal de permisos
  */
 function permissionsMiddleware(req, res, next) {
+  // Saltar validación para OPTIONS (CORS preflight)
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   // Saltar validación para rutas públicas
   if (isPublicRoute(req.path, req.method)) {
     return next();
