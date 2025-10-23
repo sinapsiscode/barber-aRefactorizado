@@ -582,7 +582,9 @@
       "estado": "active",
       "ultimaVisita": "2025-08-04T21:23:48.118Z",
       "createdAt": "2024-09-18T11:18:24.923Z",
-      "updatedAt": "2025-10-07T22:00:20.421Z"
+      "updatedAt": "2025-10-23T20:51:55.534Z",
+      "noEstaBienvenido": false,
+      "sucursalId": 1
     },
     {
       "id": 5,
@@ -602,7 +604,9 @@
       "estado": "active",
       "ultimaVisita": "2025-10-05T17:29:22.769Z",
       "createdAt": "2024-10-07T07:35:59.866Z",
-      "updatedAt": "2025-10-07T22:00:20.421Z"
+      "updatedAt": "2025-10-23T20:51:47.902Z",
+      "sucursalId": 1,
+      "notas": ""
     },
     {
       "id": 6,
@@ -1699,7 +1703,8 @@
       "experiencia": "10 años de experiencia",
       "descripcion": "Ustilo cetera animi vinitor. Caterva aspicio tersus copiose conqueror defero cursus. Teneo patior contabesco capio vicinus.",
       "createdAt": "2023-11-24T23:55:29.956Z",
-      "updatedAt": "2025-10-07T22:00:20.430Z"
+      "updatedAt": "2025-10-23T20:50:52.853Z",
+      "presente": true
     },
     {
       "id": 5,
@@ -4181,6 +4186,26 @@
       "createdAt": "2025-10-23T20:12:31.298Z",
       "updatedAt": "2025-10-23T20:12:31.298Z",
       "id": 102
+    },
+    {
+      "clienteId": 51,
+      "nombreCliente": "Juan Cliente",
+      "barberoId": 10,
+      "nombreBarbero": "Brandon Mertz",
+      "sucursalId": 1,
+      "fecha": "2025-11-06",
+      "hora": "13:00",
+      "servicios": [
+        8
+      ],
+      "precioTotal": 60,
+      "duracion": 45,
+      "estado": "pending_payment",
+      "notas": "dsfgfhfdh",
+      "recordatorioEnviado": false,
+      "createdAt": "2025-10-23T22:12:37.844Z",
+      "updatedAt": "2025-10-23T22:12:37.844Z",
+      "id": 103
     }
   ],
   "servicios": [
@@ -5430,7 +5455,19 @@
   "recompensasCliente": [],
   "portfolio": [],
   "reviews": [],
-  "asistencias": [],
+  "asistencias": [
+    {
+      "barberoId": 4,
+      "fecha": "2025-10-23",
+      "entrada": "15:50:52",
+      "salida": null,
+      "horasTrabajadas": 0,
+      "estado": "present",
+      "notas": "",
+      "sucursalId": 1,
+      "id": 1
+    }
+  ],
   "metodosPago": [
     {
       "id": "efectivo",

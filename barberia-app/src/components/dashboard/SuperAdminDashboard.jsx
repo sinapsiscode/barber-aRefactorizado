@@ -5,7 +5,7 @@ import { BranchForm } from '../branches';
 import { MetricCard, CountryFlag } from '../common';
 import RewardsManagement from '../loyalty/RewardsManagement';
 
-const SuperAdminDashboard = () => {
+const SuperAdminDashboard = ({ onPageChange }) => {
   const { branches, selectedBranch, loadBranches, getTotalStats, getCountryByCode } = useBranchStore();
   const { loadTransactions, getFinancialSummary } = useFinancialStore();
   const { loadMockData, getAppointmentStats } = useAppointmentStore();
@@ -158,6 +158,10 @@ const SuperAdminDashboard = () => {
         </button>
 
         <button
+          onClick={() => {
+            console.log('🔧 Botón Configuración clicked, onPageChange:', onPageChange);
+            onPageChange?.('settings');
+          }}
           className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-between"
         >
           <div className="flex items-center space-x-3">

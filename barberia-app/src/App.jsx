@@ -144,7 +144,7 @@ function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard onPageChange={setCurrentPage} />;
       case 'appointments':
         // TODO REFACTOR: Mover lógica de roles a route guards
         // Ejemplo: /appointments/client, /appointments/barber, etc.
@@ -165,7 +165,7 @@ function App() {
       case 'settings':
         return <Settings />;
       default:
-        return <Dashboard />;
+        return <Dashboard onPageChange={setCurrentPage} />;
     }
   };
 

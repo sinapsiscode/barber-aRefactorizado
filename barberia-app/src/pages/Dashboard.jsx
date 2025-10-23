@@ -5,13 +5,13 @@ import BarberDashboard from '../components/dashboard/BarberDashboard';
 import ReceptionDashboard from '../components/dashboard/ReceptionDashboard';
 import ClientDashboard from '../components/dashboard/ClientDashboard';
 
-const Dashboard = () => {
+const Dashboard = ({ onPageChange }) => {
   const { user } = useAuthStore();
 
   const renderDashboard = () => {
     switch (user?.role) {
       case 'super_admin':
-        return <SuperAdminDashboard />;
+        return <SuperAdminDashboard onPageChange={onPageChange} />;
       case 'branch_admin':
         return <BranchAdminDashboard />;
       case 'barber':
