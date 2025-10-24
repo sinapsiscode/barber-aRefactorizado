@@ -1948,6 +1948,47 @@
       "descripcion": "Solutio demitto vomica. Eaque cultellus comminor canis templum quidem. Accusamus ter ager contego.",
       "createdAt": "2023-11-16T06:37:16.629Z",
       "updatedAt": "2025-10-07T22:00:20.433Z"
+    },
+    {
+      "nombre": "",
+      "email": "",
+      "telefono": "",
+      "sucursalId": 1,
+      "especialidades": [
+        "Fade Moderno",
+        "Tratamientos Capilares"
+      ],
+      "calificacion": 5,
+      "totalServicios": 0,
+      "totalGanancias": 0,
+      "presente": false,
+      "pais": "PE",
+      "estado": "active",
+      "experiencia": "4",
+      "logros": [],
+      "createdAt": "2025-10-24T00:49:42.823Z",
+      "updatedAt": "2025-10-24T00:49:42.823Z",
+      "id": 16
+    },
+    {
+      "nombre": "GIANPIERRRRRRRRRE",
+      "email": "gd@gmai.com",
+      "telefono": "987345543",
+      "sucursalId": 6,
+      "especialidades": [
+        "Corte Clásico"
+      ],
+      "calificacion": 5,
+      "totalServicios": 0,
+      "totalGanancias": 0,
+      "presente": false,
+      "pais": "PE",
+      "estado": "active",
+      "experiencia": "3",
+      "logros": [],
+      "createdAt": "2025-10-24T00:50:37.446Z",
+      "updatedAt": "2025-10-24T00:50:37.446Z",
+      "id": 17
     }
   ],
   "sucursales": [

@@ -26,21 +26,48 @@ const middlewares = jsonServer.defaults({
   logger: false // Deshabilitamos el logger por defecto para usar morgan
 });
 
-// Configuración
+// Configuración desde variables de entorno
 const PORT = process.env.PORT;
+const HOST = process.env.HOST;
 const DELAY = process.env.DELAY;
+
+// CORS Configuration
+const CORS_ALLOWED_ORIGINS = process.env.CORS_ALLOWED_ORIGINS
+  ? process.env.CORS_ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
+
+const CORS_ALLOWED_HOSTS = process.env.CORS_ALLOWED_HOSTS
+  ? process.env.CORS_ALLOWED_HOSTS.split(',').map(host => host.trim())
+  : [];
 
 // ============================================
 // MIDDLEWARES GLOBALES
 // ============================================
 
-// CORS - Permitir requests desde el frontend (cualquier puerto de localhost)
+// CORS - Permitir requests desde orígenes autorizados
 server.use(cors({
   origin: (origin, callback) => {
-    // Permitir requests sin origin (como Postman) y cualquier localhost
-    if (!origin || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+    // Permitir requests sin origin (como Postman, curl, etc.)
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    // Verificar si el origin está en la lista de orígenes permitidos
+    if (CORS_ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    // Verificar si el origin contiene alguno de los hosts permitidos
+    const isAllowedHost = CORS_ALLOWED_HOSTS.some(host => {
+      return origin.startsWith(`http://${host}:`) || origin.startsWith(`https://${host}:`);
+    });
+
+    if (isAllowedHost) {
       callback(null, true);
     } else {
+      console.warn(`❌ CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -381,10 +408,10 @@ server.listen(PORT, () => {
   console.log('║     🚀  BACKEND BARBERÍA - JSON SERVER RUNNING  🚀     ║');
   console.log('║                                                        ║');
   console.log('╚════════════════════════════════════════════════════════╝\n');
-  console.log(`📡 Server: http://localhost:${PORT}`);
-  console.log(`📊 Resources: http://localhost:${PORT}/`);
-  console.log(`💚 Health: http://localhost:${PORT}/health`);
-  console.log(`🔑 Login: POST http://localhost:${PORT}/login`);
+  console.log(`📡 Server: http://${HOST}:${PORT}`);
+  console.log(`📊 Resources: http://${HOST}:${PORT}/`);
+  console.log(`💚 Health: http://${HOST}:${PORT}/health`);
+  console.log(`🔑 Login: POST http://${HOST}:${PORT}/login`);
   console.log(`\n⏱️  Delay: ${DELAY}ms (simula latencia de red)`);
   console.log(`\n📁 Database: ${path.join(__dirname, 'db.json')}`);
   console.log('\n🔐 Headers requeridos:');

@@ -148,6 +148,15 @@ export const useStaffManagement = () => {
     showServicesDetails,
     expandedServicesBarber,
 
+    // UI State Setters (agregados para compatibilidad)
+    setShowForm,
+    setShowAttendance,
+    setShowReviews,
+    setSelectedBarber,
+    setShowCommissionDetails,
+    setShowServicesDetails,
+    setExpandedServicesBarber,
+
     // Branch Filter
     getBranchTitle,
     getBranchDescription,
