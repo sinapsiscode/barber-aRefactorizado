@@ -23,13 +23,14 @@ export const useAppointmentFilters = (appointments, user, selectedBranch, select
     // Filtrar por tab seleccionado
     switch (selectedTab) {
       case TAB_TYPES.PENDING_PAYMENT:
-        return filtered.filter(apt => apt.status === APPOINTMENT_STATUS.PENDING_PAYMENT);
+        return filtered.filter(apt => (apt.status || apt.estado) === APPOINTMENT_STATUS.PENDING_PAYMENT);
 
       case TAB_TYPES.PENDING_APPROVAL:
-        return filtered.filter(apt =>
-          apt.status === APPOINTMENT_STATUS.PENDING ||
-          apt.status === APPOINTMENT_STATUS.UNDER_REVIEW
-        );
+        return filtered.filter(apt => {
+          const appointmentStatus = apt.status || apt.estado;
+          return appointmentStatus === APPOINTMENT_STATUS.PENDING ||
+            appointmentStatus === APPOINTMENT_STATUS.UNDER_REVIEW;
+        });
 
       default:
         return filtered;
@@ -38,13 +39,14 @@ export const useAppointmentFilters = (appointments, user, selectedBranch, select
 
   const counters = useMemo(() => ({
     pendingPayment: appointments?.filter(apt =>
-      apt.status === APPOINTMENT_STATUS.PENDING_PAYMENT
+      (apt.status || apt.estado) === APPOINTMENT_STATUS.PENDING_PAYMENT
     ).length || 0,
 
-    pendingApproval: appointments?.filter(apt =>
-      apt.status === APPOINTMENT_STATUS.PENDING ||
-      apt.status === APPOINTMENT_STATUS.UNDER_REVIEW
-    ).length || 0
+    pendingApproval: appointments?.filter(apt => {
+      const appointmentStatus = apt.status || apt.estado;
+      return appointmentStatus === APPOINTMENT_STATUS.PENDING ||
+        appointmentStatus === APPOINTMENT_STATUS.UNDER_REVIEW;
+    }).length || 0
   }), [appointments]);
 
   return {

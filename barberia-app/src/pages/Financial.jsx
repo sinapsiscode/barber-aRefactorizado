@@ -33,6 +33,8 @@ const Financial = () => {
   const {
     transactions,
     loadTransactions,
+    loadPaymentMethods,
+    loadCategories,
     paymentMethods,
     categories
   } = useFinancialStore();
@@ -49,6 +51,12 @@ const Financial = () => {
   useEffect(() => {
     if (transactions.length === 0) {
       loadTransactions();
+    }
+    if (paymentMethods.length === 0) {
+      loadPaymentMethods();
+    }
+    if (!categories.income || !categories.expense) {
+      loadCategories();
     }
   }, []);
 

@@ -2947,10 +2947,10 @@
       ],
       "precioTotal": 35,
       "duracion": 45,
-      "estado": "pending",
+      "estado": "confirmed",
       "recordatorioEnviado": false,
       "createdAt": "2025-04-08T22:32:48.302Z",
-      "updatedAt": "2025-10-07T22:00:20.434Z"
+      "updatedAt": "2025-11-14T23:08:17.403Z"
     },
     {
       "id": 35,
@@ -4124,25 +4124,6 @@
       "updatedAt": "2025-10-07T22:00:20.435Z"
     },
     {
-      "id": 92,
-      "clienteId": 34,
-      "clienteNombre": "Lynne Gerhold",
-      "barberoId": 1,
-      "barberoNombre": "Ben Steuber",
-      "sucursalId": 4,
-      "fecha": "2025-11-02",
-      "hora": "10:30",
-      "servicios": [
-        7
-      ],
-      "precioTotal": 10,
-      "duracion": 15,
-      "estado": "cancelled",
-      "recordatorioEnviado": false,
-      "createdAt": "2025-03-02T04:54:56.739Z",
-      "updatedAt": "2025-10-07T22:00:20.435Z"
-    },
-    {
       "id": 93,
       "clienteId": 22,
       "clienteNombre": "Ralph Rice",
@@ -4367,6 +4348,26 @@
       "createdAt": "2025-10-23T22:12:37.844Z",
       "updatedAt": "2025-10-23T22:12:37.844Z",
       "id": 103
+    },
+    {
+      "clienteId": "51",
+      "nombreCliente": "Juan Cliente",
+      "barberoId": "17",
+      "nombreBarbero": "GIANPIERRRRRRRRRE",
+      "sucursalId": 1,
+      "fecha": "2025-11-14",
+      "hora": "09:30",
+      "servicios": [
+        1
+      ],
+      "precioTotal": 25,
+      "duracion": 30,
+      "estado": "pending",
+      "notas": "asvasv",
+      "recordatorioEnviado": false,
+      "createdAt": "2025-11-14T23:08:57.107Z",
+      "updatedAt": "2025-11-14T23:08:57.107Z",
+      "id": 104
     }
   ],
   "servicios": [
@@ -5564,6 +5565,21 @@
       "fecha": "2025-09-27",
       "createdAt": "2025-09-02T03:45:12.605Z",
       "updatedAt": "2025-10-07T22:00:20.438Z"
+    },
+    {
+      "tipo": "income",
+      "categoria": "products",
+      "monto": 777,
+      "metodoPago": "yape",
+      "descripcion": "asfasfaf",
+      "sucursalId": 1,
+      "clienteId": null,
+      "barberoId": null,
+      "citaId": null,
+      "fecha": "2025-11-14",
+      "createdAt": "2025-11-14T23:10:24.683Z",
+      "updatedAt": "2025-11-14T23:10:24.683Z",
+      "id": 81
     }
   ],
   "recompensas": [

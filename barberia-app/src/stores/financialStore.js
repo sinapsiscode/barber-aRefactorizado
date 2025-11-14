@@ -74,6 +74,66 @@ const useFinancialStore = create(
       },
 
       /**
+       * CARGAR MÉTODOS DE PAGO - Fetch desde API
+       */
+      loadPaymentMethods: async () => {
+        try {
+          const metodosData = await metodosPagoApi.getAll();
+
+          // Mapear estructura backend a frontend
+          const paymentMethods = metodosData.map(m => ({
+            id: m.id,
+            name: m.nombre,
+            active: m.activo,
+            icon: m.icono,
+            description: m.descripcion
+          }));
+
+          set({ paymentMethods });
+          return { success: true };
+        } catch (error) {
+          console.error('Error cargando métodos de pago:', error);
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * CARGAR CATEGORÍAS - Fetch desde API
+       */
+      loadCategories: async () => {
+        try {
+          const [categoriasIngresosData, categoriasGastosData] = await Promise.all([
+            categoriasIngresosApi.getAll(),
+            categoriasGastosApi.getAll()
+          ]);
+
+          // Mapear estructura backend a frontend
+          const categories = {
+            income: categoriasIngresosData.map(c => ({
+              id: c.id,
+              name: c.nombre,
+              icon: c.icono,
+              color: c.color,
+              description: c.descripcion
+            })),
+            expense: categoriasGastosData.map(c => ({
+              id: c.id,
+              name: c.nombre,
+              icon: c.icono,
+              color: c.color,
+              description: c.descripcion
+            }))
+          };
+
+          set({ categories });
+          return { success: true };
+        } catch (error) {
+          console.error('Error cargando categorías:', error);
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
        * AGREGAR TRANSACCIÓN - POST a API
        */
       addTransaction: async (transactionData) => {

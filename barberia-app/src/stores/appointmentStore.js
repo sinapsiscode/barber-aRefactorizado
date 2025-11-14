@@ -346,7 +346,9 @@ const useAppointmentStore = create(
       getAppointmentsByDate: (date) => {
         const { appointments } = get();
         return appointments.filter(apt => {
-          const aptDate = new Date(apt.date);
+          const appointmentDate = apt.date || apt.fecha;
+          if (!appointmentDate) return false;
+          const aptDate = new Date(appointmentDate);
           return aptDate.toDateString() === date.toDateString();
         });
       },
@@ -363,12 +365,12 @@ const useAppointmentStore = create(
 
       getAppointmentsByStatus: (status) => {
         const { appointments } = get();
-        return appointments.filter(apt => apt.status === status);
+        return appointments.filter(apt => (apt.status || apt.estado) === status);
       },
 
       getPendingAppointments: () => {
         const { appointments } = get();
-        return appointments.filter(apt => apt.status === 'pending');
+        return appointments.filter(apt => (apt.status || apt.estado) === 'pending');
       },
 
       getAppointmentDetails: (appointmentId) => {
@@ -391,12 +393,15 @@ const useAppointmentStore = create(
             slotDate.setHours(hour, minute, 0, 0);
 
             const isAvailable = !get().appointments.some(apt => {
-              const aptDate = new Date(apt.date);
+              const appointmentDate = apt.date || apt.fecha;
+              if (!appointmentDate) return false;
+              const aptDate = new Date(appointmentDate);
               const aptTime = apt.time;
+              const appointmentStatus = apt.status || apt.estado;
               return aptDate.toDateString() === date.toDateString() &&
                 aptTime === time &&
                 apt.barberId === barberId &&
-                apt.status !== 'cancelled';
+                appointmentStatus !== 'cancelled';
             });
 
             slots.push({
@@ -646,26 +651,27 @@ const useAppointmentStore = create(
         const { appointments } = get();
         const today = new Date().toDateString();
 
-        const todayAppointments = appointments.filter(apt =>
-          new Date(apt.date).toDateString() === today
-        );
+        const todayAppointments = appointments.filter(apt => {
+          const appointmentDate = apt.date || apt.fecha;
+          return appointmentDate && new Date(appointmentDate).toDateString() === today;
+        });
 
         return {
           total: appointments.length,
           today: todayAppointments.length,
-          pending: appointments.filter(apt => apt.status === 'pending').length,
-          confirmed: appointments.filter(apt => apt.status === 'confirmed').length,
-          completed: appointments.filter(apt => apt.status === 'completed').length,
-          cancelled: appointments.filter(apt => apt.status === 'cancelled').length
+          pending: appointments.filter(apt => (apt.status || apt.estado) === 'pending').length,
+          confirmed: appointments.filter(apt => (apt.status || apt.estado) === 'confirmed').length,
+          completed: appointments.filter(apt => (apt.status || apt.estado) === 'completed').length,
+          cancelled: appointments.filter(apt => (apt.status || apt.estado) === 'cancelled').length
         };
       },
 
       getReceptionStats: () => {
         const { appointments } = get();
-        const pending = appointments.filter(apt => apt.status === 'pending').length;
-        const underReview = appointments.filter(apt => apt.status === 'under_review').length;
-        const approved = appointments.filter(apt => apt.status === 'confirmed').length;
-        const rejected = appointments.filter(apt => apt.status === 'rejected').length;
+        const pending = appointments.filter(apt => (apt.status || apt.estado) === 'pending').length;
+        const underReview = appointments.filter(apt => (apt.status || apt.estado) === 'under_review').length;
+        const approved = appointments.filter(apt => (apt.status || apt.estado) === 'confirmed').length;
+        const rejected = appointments.filter(apt => (apt.status || apt.estado) === 'rejected').length;
 
         return {
           pending,
@@ -709,11 +715,13 @@ const useAppointmentStore = create(
         tomorrow.setDate(tomorrow.getDate() + 1);
         const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-        return appointments.filter(apt =>
-          apt.date === tomorrowStr &&
-          apt.status === 'confirmed' &&
-          !apt.reminderSent
-        );
+        return appointments.filter(apt => {
+          const appointmentDate = apt.date || apt.fecha;
+          const appointmentStatus = apt.status || apt.estado;
+          return appointmentDate === tomorrowStr &&
+            appointmentStatus === 'confirmed' &&
+            !apt.reminderSent;
+        });
       },
 
       markReminderSent: async (appointmentId) => {
