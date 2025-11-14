@@ -153,7 +153,7 @@ const Branches = () => {
                           {branch.name || branch.nombre}
                         </h3>
                         <div className="flex items-center space-x-1 mt-1">
-                          <CountryFlag countryCode={branch.country || branch.pais} size="sm" />
+                          <CountryFlag countryCode={branch.country || branch.pais} size={16} />
                           <span className="text-xs text-gray-500">
                             {branch.city || branch.ciudad}
                           </span>

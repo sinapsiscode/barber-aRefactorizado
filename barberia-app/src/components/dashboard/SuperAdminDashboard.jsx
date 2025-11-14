@@ -18,14 +18,13 @@ const SuperAdminDashboard = ({ onPageChange }) => {
   const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'rewards'
 
   useEffect(() => {
-    if (branches.length === 0) {
-      loadBranches();
-      loadTransactions();
-      loadMockData();
-      loadStaff();
-      loadClients();
-    }
-  }, []);
+    // Cargar datos al montar el componente
+    loadBranches();
+    loadTransactions();
+    loadMockData();
+    loadStaff();
+    loadClients();
+  }, []); // Se ejecuta solo al montar
 
   // Filtrar datos según la sede seleccionada
   const branchStats = selectedBranch ? {
@@ -234,20 +233,30 @@ const SuperAdminDashboard = ({ onPageChange }) => {
             Rendimiento por Sede
           </h3>
           <div className="space-y-4">
-            {(selectedBranch ? [selectedBranch] : branches.slice(0, 5)).map((branch) => (
-              <div key={branch.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-700 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900 dark:text-white">{branch.name}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{branch.city}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-green-600">
-                    S/{((branch.stats?.monthlyRevenue || 0) / 1000).toFixed(1)}K
-                  </p>
-                  <p className="text-xs text-gray-500">{branch.stats?.totalAppointments || 0} citas</p>
-                </div>
+            {branches.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                No hay sedes registradas
               </div>
-            ))}
+            ) : (
+              (selectedBranch ? [selectedBranch] : branches.slice(0, 5)).map((branch) => (
+                <div key={branch.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-700 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-white">
+                      {branch.name || branch.nombre}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {branch.city || branch.ciudad}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-green-600">
+                      S/{((branch.stats?.monthlyRevenue || 0) / 1000).toFixed(1)}K
+                    </p>
+                    <p className="text-xs text-gray-500">{branch.stats?.totalAppointments || 0} citas</p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -348,57 +357,63 @@ const SuperAdminDashboard = ({ onPageChange }) => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(selectedBranch ? [selectedBranch] : branches.slice(0, 6)).map((branch) => (
-            <div key={branch.id} className="border border-gray-200 dark:border-[#D4AF37]/20 rounded-lg p-4 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center space-x-2">
-                  <CountryFlag countryCode={branch.country} size={20} />
-                  <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
-                      {branch.name}
-                    </h4>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {branch.city}, {getCountryByCode(branch.country)?.name}
-                    </p>
+          {branches.length === 0 ? (
+            <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
+              No hay sucursales registradas
+            </div>
+          ) : (
+            (selectedBranch ? [selectedBranch] : branches.slice(0, 6)).map((branch) => (
+              <div key={branch.id} className="border border-gray-200 dark:border-[#D4AF37]/20 rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <CountryFlag countryCode={branch.country || branch.pais} size={20} />
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                        {branch.name || branch.nombre}
+                      </h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {branch.city || branch.ciudad}, {getCountryByCode(branch.country || branch.pais)?.name}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleEditBranch(branch)}
+                    className="text-gray-400 hover:text-[#D4AF37] transition-colors"
+                  >
+                    <FiEdit className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Ingresos:</span>
+                    <span className="font-medium text-green-600">
+                      S/${((branch.stats?.monthlyRevenue || 0) / 1000).toFixed(1)}K
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Personal:</span>
+                    <span className="font-medium">{branch.stats?.staffCount || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Citas:</span>
+                    <span className="font-medium">{branch.stats?.totalAppointments || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Clientes:</span>
+                    <span className="font-medium">{branch.stats?.clientCount || 0}</span>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleEditBranch(branch)}
-                  className="text-gray-400 hover:text-[#D4AF37] transition-colors"
-                >
-                  <FiEdit className="h-4 w-4" />
-                </button>
-              </div>
-              
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Ingresos:</span>
-                  <span className="font-medium text-green-600">
-                    S/${((branch.stats?.monthlyRevenue || 0) / 1000).toFixed(1)}K
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Personal:</span>
-                  <span className="font-medium">{branch.stats?.staffCount || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Citas:</span>
-                  <span className="font-medium">{branch.stats?.totalAppointments || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Clientes:</span>
-                  <span className="font-medium">{branch.stats?.clientCount || 0}</span>
+
+                <div className="mt-3 pt-3 border-t border-gray-100 dark:border-[#D4AF37]/10">
+                  <div className="flex items-center space-x-2">
+                    <FiMapPin className="h-3 w-3 text-gray-400" />
+                    <span className="text-xs text-gray-500 truncate">{branch.address || branch.direccion}</span>
+                  </div>
                 </div>
               </div>
-              
-              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-[#D4AF37]/10">
-                <div className="flex items-center space-x-2">
-                  <FiMapPin className="h-3 w-3 text-gray-400" />
-                  <span className="text-xs text-gray-500 truncate">{branch.address}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
