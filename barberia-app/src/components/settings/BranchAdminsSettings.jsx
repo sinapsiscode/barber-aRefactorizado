@@ -6,15 +6,22 @@ import BranchAdminForm from '../admins/BranchAdminForm';
 import Swal from 'sweetalert2';
 
 const BranchAdminsSettings = () => {
-  const { user, users, addUser, updateUser, deleteUser } = useAuthStore();
+  const { user, users, addUser, updateUser, deleteUser, loadUsers } = useAuthStore();
   const { branches } = useBranchStore();
 
   const [showForm, setShowForm] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Cargar usuarios al montar
+  useEffect(() => {
+    if (!users || users.length === 0) {
+      loadUsers();
+    }
+  }, [users, loadUsers]);
+
   // Filtrar solo administradores de sede
-  const branchAdmins = users.filter(u => u.role === 'branch_admin');
+  const branchAdmins = users ? users.filter(u => u.role === 'branch_admin') : [];
 
   // Obtener estadísticas
   const stats = {

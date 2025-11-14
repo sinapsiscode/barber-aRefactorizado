@@ -20,7 +20,8 @@
       "Bash(curl:*)",
       "Bash(xargs sed:*)",
       "Bash(timeout:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(nul)"
     ],
     "deny": [],
     "ask": []

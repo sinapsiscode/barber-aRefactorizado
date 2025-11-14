@@ -18,6 +18,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const { authMiddleware, requireBranchAccess } = require('./middlewares/auth');
 const { permissionsMiddleware } = require('./middlewares/permissions');
+const { AUTH_ROUTES, SPECIAL_ROUTES, RESOURCE_ROUTES } = require('./config/routes');
 
 // Crear servidor
 const server = jsonServer.create();
@@ -44,37 +45,22 @@ const CORS_ALLOWED_HOSTS = process.env.CORS_ALLOWED_HOSTS
 // MIDDLEWARES GLOBALES
 // ============================================
 
-// CORS - Permitir requests desde orígenes autorizados
-server.use(cors({
-  origin: (origin, callback) => {
-    // Permitir requests sin origin (como Postman, curl, etc.)
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
-
-    // Verificar si el origin está en la lista de orígenes permitidos
-    if (CORS_ALLOWED_ORIGINS.includes(origin)) {
-      callback(null, true);
-      return;
-    }
-
-    // Verificar si el origin contiene alguno de los hosts permitidos
-    const isAllowedHost = CORS_ALLOWED_HOSTS.some(host => {
-      return origin.startsWith(`http://${host}:`) || origin.startsWith(`https://${host}:`);
-    });
-
-    if (isAllowedHost) {
-      callback(null, true);
-    } else {
-      console.warn(`❌ CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+// CORS - Configuración muy permisiva para debugging
+const corsOptions = {
+  origin: true, // Permitir todos los orígenes en desarrollo
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-role-id', 'x-user-id', 'Authorization', 'Cache-Control', 'Pragma', 'Expires'],
-  credentials: true
-}));
+  credentials: true,
+  optionsSuccessStatus: 204,
+  preflightContinue: false,
+  maxAge: 86400 // Cache preflight por 24 horas
+};
+
+// Apply CORS before any other middleware
+server.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+server.options('*', cors(corsOptions));
 
 // Logger HTTP con morgan
 server.use(morgan('dev'));
@@ -97,7 +83,7 @@ server.use((req, res, next) => {
 /**
  * Ruta de health check
  */
-server.get('/health', (req, res) => {
+server.get(SPECIAL_ROUTES.HEALTH, (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
@@ -111,7 +97,7 @@ server.get('/health', (req, res) => {
  * POST /login
  * Body: { email, password }
  */
-server.post('/login', (req, res) => {
+server.post(AUTH_ROUTES.LOGIN, (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -164,7 +150,7 @@ server.post('/login', (req, res) => {
  * POST /register
  * Body: { nombre, email, password, rolId }
  */
-server.post('/register', (req, res) => {
+server.post(AUTH_ROUTES.REGISTER, (req, res) => {
   const { nombre, email, password, rolId } = req.body;
 
   // Validaciones básicas

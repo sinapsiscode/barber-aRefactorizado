@@ -13,8 +13,9 @@ export const usePublicData = () => {
 
   useEffect(() => {
     // Cargar barberos si no están cargados
+    // includeAttendance = false para acceso público (no requiere autenticación)
     if (barbers.length === 0 && !loadingStaff) {
-      loadStaff();
+      loadStaff(false);
     }
   }, [barbers.length, loadStaff, loadingStaff]);
 

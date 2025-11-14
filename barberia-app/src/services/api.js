@@ -8,6 +8,8 @@
  * - Headers de autenticación automáticos
  */
 
+import { RESOURCE_ROUTES, AUTH_ROUTES, SPECIAL_ROUTES } from '../config/routes';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 /**
@@ -159,24 +161,24 @@ const createCrudApi = (resource) => ({
 });
 
 /**
- * API para cada recurso (nombres en ESPAÑOL según db.json)
+ * API para cada recurso (usando rutas centralizadas)
  */
-// ✅ FIXED: Usando nombres en español que coinciden con db.json
-export const usuariosApi = createCrudApi('usuarios');
-export const clientesApi = createCrudApi('clientes');
-export const sucursalesApi = createCrudApi('sucursales');
-export const barberosApi = createCrudApi('barberos');
-export const serviciosApi = createCrudApi('servicios');
-export const citasApi = createCrudApi('citas');
-export const recompensasApi = createCrudApi('recompensas');
-export const transaccionesPuntosApi = createCrudApi('transaccionesPuntos');
-export const recompensasClienteApi = createCrudApi('recompensasCliente');
-export const portfolioApi = createCrudApi('portfolio');
-export const transaccionesApi = createCrudApi('transacciones');
-export const asistenciasApi = createCrudApi('asistencias');
-export const reviewsApi = createCrudApi('reviews');
-export const rolesApi = createCrudApi('roles');
-export const modulosApi = createCrudApi('modulos');
+// ✅ FIXED: Usando nombres desde configuración centralizada
+export const usuariosApi = createCrudApi(RESOURCE_ROUTES.USUARIOS.substring(1));
+export const clientesApi = createCrudApi(RESOURCE_ROUTES.CLIENTES.substring(1));
+export const sucursalesApi = createCrudApi(RESOURCE_ROUTES.SUCURSALES.substring(1));
+export const barberosApi = createCrudApi(RESOURCE_ROUTES.BARBEROS.substring(1));
+export const serviciosApi = createCrudApi(RESOURCE_ROUTES.SERVICIOS.substring(1));
+export const citasApi = createCrudApi(RESOURCE_ROUTES.CITAS.substring(1));
+export const recompensasApi = createCrudApi(RESOURCE_ROUTES.RECOMPENSAS.substring(1));
+export const transaccionesPuntosApi = createCrudApi(RESOURCE_ROUTES.TRANSACCIONES_PUNTOS.substring(1));
+export const recompensasClienteApi = createCrudApi(RESOURCE_ROUTES.RECOMPENSAS_CLIENTE.substring(1));
+export const portfolioApi = createCrudApi(RESOURCE_ROUTES.PORTFOLIO.substring(1));
+export const transaccionesApi = createCrudApi(RESOURCE_ROUTES.TRANSACCIONES.substring(1));
+export const asistenciasApi = createCrudApi(RESOURCE_ROUTES.ASISTENCIAS.substring(1));
+export const reviewsApi = createCrudApi(RESOURCE_ROUTES.REVIEWS.substring(1));
+export const rolesApi = createCrudApi(RESOURCE_ROUTES.ROLES.substring(1));
+export const modulosApi = createCrudApi(RESOURCE_ROUTES.MODULOS.substring(1));
 
 /**
  * API de autenticación (usa endpoint personalizado del backend)
@@ -187,7 +189,7 @@ export const authApi = {
    */
   login: async (email, password) => {
     try {
-      const response = await apiRequest('/login', {
+      const response = await apiRequest(AUTH_ROUTES.LOGIN, {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
@@ -217,7 +219,7 @@ export const authApi = {
    */
   register: async (userData) => {
     try {
-      const response = await apiRequest('/register', {
+      const response = await apiRequest(AUTH_ROUTES.REGISTER, {
         method: 'POST',
         body: JSON.stringify(userData),
       });

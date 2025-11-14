@@ -26,11 +26,12 @@ const useStaffStore = create(
 
       /**
        * CARGAR BARBEROS - Fetch desde API
+       * @param {boolean} includeAttendance - Si incluir asistencias (requiere autenticación)
        */
-      loadStaff: async () => {
+      loadStaff: async (includeAttendance = true) => {
         set({ isLoading: true, error: null });
         try {
-          // Cargar barberos
+          // Cargar barberos (endpoint público)
           const barberosData = await barberosApiExtended.getAll();
 
           // Mapear estructura backend (español) a frontend (inglés)
@@ -54,19 +55,29 @@ const useStaffStore = create(
             updatedAt: b.updatedAt
           }));
 
-          // Cargar asistencias
-          const asistenciasData = await asistenciasApi.getAll();
+          let attendance = [];
 
-          const attendance = asistenciasData.map(a => ({
-            id: a.id,
-            barberId: a.barberoId,
-            date: a.fecha,
-            checkIn: a.entrada,
-            checkOut: a.salida,
-            hoursWorked: a.horasTrabajadas || 0,
-            status: a.estado,
-            notes: a.notas
-          }));
+          // Solo cargar asistencias si se solicita (requiere autenticación)
+          // Para acceso público (PublicBooking), skip attendance
+          if (includeAttendance) {
+            try {
+              const asistenciasData = await asistenciasApi.getAll();
+              attendance = asistenciasData.map(a => ({
+                id: a.id,
+                barberId: a.barberoId,
+                date: a.fecha,
+                checkIn: a.entrada,
+                checkOut: a.salida,
+                hoursWorked: a.horasTrabajadas || 0,
+                status: a.estado,
+                notes: a.notas
+              }));
+            } catch (attendanceError) {
+              // Si falla cargar asistencias (sin permisos), continuar sin ellas
+              console.warn('⚠️ No se pudieron cargar asistencias (puede ser acceso público):', attendanceError.message);
+              attendance = [];
+            }
+          }
 
           set({ barbers, attendance, isLoading: false });
           return { success: true };

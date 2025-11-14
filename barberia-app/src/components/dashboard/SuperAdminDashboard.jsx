@@ -77,9 +77,11 @@ const SuperAdminDashboard = ({ onPageChange }) => {
     setShowBranchForm(true);
   };
 
-  const handleCloseBranchForm = () => {
+  const handleCloseBranchForm = async () => {
     setShowBranchForm(false);
     setEditingBranch(null);
+    // Recargar la lista de sucursales después de cerrar el formulario
+    await loadBranches();
   };
 
   const MetricCard = ({ title, value, icon: Icon, color, change, description }) => (
@@ -343,13 +345,6 @@ const SuperAdminDashboard = ({ onPageChange }) => {
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
             Gestión de Sucursales
           </h3>
-          <button
-            onClick={handleAddBranch}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#D4AF37] hover:bg-[#B8860B] text-black rounded-lg transition-colors"
-          >
-            <FiPlus className="h-4 w-4" />
-            <span>Nueva Sucursal</span>
-          </button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

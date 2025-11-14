@@ -2140,6 +2140,126 @@
       "createdAt": "2025-10-23T20:14:09.514Z",
       "updatedAt": "2025-10-23T20:14:09.514Z",
       "id": 6
+    },
+    {
+      "name": "gsdgsdg",
+      "city": "sdgsdg",
+      "country": "PE",
+      "address": "sdgsdg",
+      "phone": "98767676373",
+      "email": "asf@gmailñ.com",
+      "manager": "aasfaf",
+      "managerPhone": "7656754566",
+      "services": [
+        "sdgsdg"
+      ],
+      "amenities": [
+        "asf"
+      ],
+      "workingHours": {
+        "monday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "tuesday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "wednesday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "thursday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "friday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "saturday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "sunday": {
+          "open": "08:00",
+          "close": "22:00"
+        }
+      },
+      "coordinates": {
+        "lat": 0,
+        "lng": 0
+      },
+      "isActive": true,
+      "stats": {
+        "totalAppointments": 0,
+        "monthlyRevenue": 0,
+        "staffCount": 0,
+        "clientCount": 0
+      },
+      "createdAt": "2025-11-14T21:52:31.710Z",
+      "updatedAt": "2025-11-14T21:52:31.710Z",
+      "id": 7
+    },
+    {
+      "name": "ACHO",
+      "city": "Lima",
+      "country": "PE",
+      "address": "Jr. Puno 7897",
+      "phone": "987876543",
+      "email": "asd@gma.com",
+      "manager": "GIANPIERRE",
+      "managerPhone": "9611709456",
+      "services": [
+        "asfasfasfasf"
+      ],
+      "amenities": [
+        "asfasfasfas"
+      ],
+      "workingHours": {
+        "monday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "tuesday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "wednesday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "thursday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "friday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "saturday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "sunday": {
+          "open": "08:00",
+          "close": "22:00"
+        }
+      },
+      "coordinates": {
+        "lat": 0,
+        "lng": 0
+      },
+      "isActive": true,
+      "stats": {
+        "totalAppointments": 0,
+        "monthlyRevenue": 0,
+        "staffCount": 0,
+        "clientCount": 0
+      },
+      "createdAt": "2025-11-14T22:10:04.787Z",
+      "updatedAt": "2025-11-14T22:10:04.787Z",
+      "id": 8
     }
   ],
   "citas": [

@@ -14,6 +14,7 @@ import Staff from './pages/Staff';
 import Clients from './pages/Clients';
 import Services from './pages/Services';
 import Settings from './pages/Settings';
+import Branches from './pages/Branches';
 import LandingPage from './pages/LandingPage';
 import PublicBooking from './pages/PublicBooking';
 
@@ -160,6 +161,8 @@ function App() {
         return <Clients />;
       case 'services':
         return <Services />;
+      case 'branches':
+        return <Branches />;
       case 'portfolio':
         return <Portfolio />;
       case 'settings':

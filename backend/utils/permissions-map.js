@@ -13,9 +13,11 @@
  * }
  */
 
+const { getResourceNameFromPath } = require('../config/routes');
+
 const permissionsMap = {
   // USUARIOS
-  'usuarios': {
+  usuarios: {
     'GET': 'ver_usuarios',
     'POST': 'crear_usuario',
     'PUT': 'editar_usuario',
@@ -209,44 +211,22 @@ function getRequiredPermission(resource, method) {
   return resourceMap[method] || null;
 }
 
-/**
- * Rutas públicas que no requieren autenticación ni permisos
- */
-const publicRoutes = [
-  '/login',
-  '/register',
-  '/portfolio', // Portfolio público (solo GET)
-  '/servicios', // Servicios públicos (solo GET)
-  '/sucursales', // Sucursales públicas para vista landing (solo GET)
-  '/barberos' // Barberos públicos para vista landing (solo GET)
-];
+// Importar isPublicRoute desde la configuración centralizada
+const { isPublicRoute: isPublicRouteConfig, PUBLIC_ROUTES } = require('../config/routes');
 
 /**
- * Verifica si una ruta es pública
+ * Verifica si una ruta es pública (delegado a la configuración centralizada)
  * @param {string} path - Path de la request
  * @param {string} method - Método HTTP
  * @returns {boolean}
  */
 function isPublicRoute(path, method) {
-  // Eliminar query params
-  const cleanPath = path.split('?')[0];
-
-  // Rutas completamente públicas
-  if (publicRoutes.includes(cleanPath) && method === 'GET') {
-    return true;
-  }
-
-  // Login y register siempre públicos
-  if (cleanPath === '/login' || cleanPath === '/register') {
-    return true;
-  }
-
-  return false;
+  return isPublicRouteConfig(path, method);
 }
 
 module.exports = {
   permissionsMap,
   getRequiredPermission,
-  publicRoutes,
+  publicRoutes: PUBLIC_ROUTES, // Exportar desde configuración centralizada
   isPublicRoute
 };

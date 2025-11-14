@@ -25,6 +25,7 @@ const useAuthStore = create(
   persist(
     (set, get) => ({
       user: null,
+      users: [], // Lista de todos los usuarios (para gestión de admins)
       currentBranch: null,
       isAuthenticated: false,
       isLoading: false,
@@ -237,10 +238,71 @@ const useAuthStore = create(
       clearError: () => set({ error: null }),
 
       /**
+       * Cargar todos los usuarios (para gestión de admins)
+       */
+      loadUsers: async () => {
+        try {
+          const usersData = await usuariosApi.getAll();
+          set({ users: usersData });
+          return { success: true, users: usersData };
+        } catch (error) {
+          console.error('Error cargando usuarios:', error);
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * Agregar nuevo usuario
+       */
+      addUser: async (userData) => {
+        try {
+          const newUser = await usuariosApi.create(userData);
+          set((state) => ({ users: [...state.users, newUser] }));
+          return { success: true, user: newUser };
+        } catch (error) {
+          console.error('Error agregando usuario:', error);
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * Actualizar usuario
+       */
+      updateUser: async (userId, updates) => {
+        try {
+          const updatedUser = await usuariosApi.update(userId, updates);
+          set((state) => ({
+            users: state.users.map(u => u.id === userId ? updatedUser : u)
+          }));
+          return { success: true, user: updatedUser };
+        } catch (error) {
+          console.error('Error actualizando usuario:', error);
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
+       * Eliminar usuario
+       */
+      deleteUser: async (userId) => {
+        try {
+          await usuariosApi.delete(userId);
+          set((state) => ({
+            users: state.users.filter(u => u.id !== userId)
+          }));
+          return { success: true };
+        } catch (error) {
+          console.error('Error eliminando usuario:', error);
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
        * Reinicializar store (útil para testing)
        */
       reset: () => set({
         user: null,
+        users: [],
         currentBranch: null,
         isAuthenticated: false,
         isLoading: false,
