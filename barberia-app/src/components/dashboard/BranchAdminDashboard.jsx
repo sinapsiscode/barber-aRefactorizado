@@ -6,12 +6,20 @@ import CountryFlag from '../common/CountryFlag';
 
 const BranchAdminDashboard = () => {
   const { user } = useAuthStore();
-  const { getStaffByBranch, getAttendanceStats } = useStaffStore();
+  const { getStaffByBranch, getAttendanceStats, loadStaff, barbers, attendance } = useStaffStore();
   const { appointments } = useAppointmentStore();
   const { branches } = useBranchStore();
-  
+
   const [showAttendanceDetails, setShowAttendanceDetails] = useState(false);
   const [showAppointmentDetails, setShowAppointmentDetails] = useState(false);
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    // Cargar personal y asistencias
+    if (barbers.length === 0 || attendance.length === 0) {
+      loadStaff(true); // true = incluir asistencias
+    }
+  }, []);
   
   // Obtener personal de la sucursal del admin
   const branchStaff = getStaffByBranch(user?.branchId || 1);
@@ -27,14 +35,26 @@ const BranchAdminDashboard = () => {
   );
   
   // Citas del día
-  const todayAppointments = branchAppointments.filter(apt => apt.date === today);
-  const completedToday = todayAppointments.filter(apt => apt.status === 'completed').length;
-  const pendingToday = todayAppointments.filter(apt => apt.status === 'confirmed').length;
+  const todayAppointments = branchAppointments.filter(apt => {
+    const appointmentDate = apt.date || apt.fecha;
+    return appointmentDate === today;
+  });
+  const completedToday = todayAppointments.filter(apt => {
+    const appointmentStatus = apt.status || apt.estado;
+    return appointmentStatus === 'completed';
+  }).length;
+  const pendingToday = todayAppointments.filter(apt => {
+    const appointmentStatus = apt.status || apt.estado;
+    return appointmentStatus === 'confirmed';
+  }).length;
   
   // Estadísticas por barbero
   const barberStats = branchStaff.map(barber => {
     const barberAppointments = todayAppointments.filter(apt => apt.barberId === barber.id);
-    const completed = barberAppointments.filter(apt => apt.status === 'completed').length;
+    const completed = barberAppointments.filter(apt => {
+      const appointmentStatus = apt.status || apt.estado;
+      return appointmentStatus === 'completed';
+    }).length;
     const total = barberAppointments.length;
     
     return {

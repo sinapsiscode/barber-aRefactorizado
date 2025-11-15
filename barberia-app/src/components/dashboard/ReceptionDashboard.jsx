@@ -1,6 +1,6 @@
 import { FiUsers, FiCalendar, FiDollarSign, FiClock, FiUserCheck, FiCamera } from 'react-icons/fi';
 
-const ReceptionDashboard = () => {
+const ReceptionDashboard = ({ onPageChange }) => {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
@@ -71,7 +71,10 @@ const ReceptionDashboard = () => {
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
               Programa una nueva cita para un cliente
             </p>
-            <button className="btn-primary w-full">
+            <button
+              onClick={() => onPageChange?.('appointments')}
+              className="btn-primary w-full"
+            >
               Nueva Cita
             </button>
           </div>
@@ -88,7 +91,10 @@ const ReceptionDashboard = () => {
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
               Registrar pagos y generar facturas
             </p>
-            <button className="btn-secondary w-full">
+            <button
+              onClick={() => onPageChange?.('financial')}
+              className="btn-secondary w-full"
+            >
               Nuevo Pago
             </button>
           </div>
@@ -105,7 +111,10 @@ const ReceptionDashboard = () => {
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
               Mostrar trabajos de barberos a clientes
             </p>
-            <button className="btn-secondary w-full">
+            <button
+              onClick={() => onPageChange?.('portfolio')}
+              className="btn-secondary w-full"
+            >
               Ver Portafolios
             </button>
           </div>
@@ -118,7 +127,10 @@ const ReceptionDashboard = () => {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Agenda de Hoy
           </h2>
-          <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+          <button
+            onClick={() => onPageChange?.('appointments')}
+            className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+          >
             Ver Calendario Completo
           </button>
         </div>

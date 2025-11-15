@@ -14,7 +14,10 @@ export const useAppointmentPermissions = (user) => {
       canApprove: role === USER_ROLES.SUPER_ADMIN || role === USER_ROLES.BRANCH_ADMIN,
       canReject: role === USER_ROLES.SUPER_ADMIN || role === USER_ROLES.BRANCH_ADMIN,
       canVerifyPayment: role === USER_ROLES.SUPER_ADMIN || role === USER_ROLES.BRANCH_ADMIN,
-      canCreateAppointment: role !== USER_ROLES.RECEPTION,
+      canCreateAppointment: role === USER_ROLES.SUPER_ADMIN ||
+                           role === USER_ROLES.BRANCH_ADMIN ||
+                           role === USER_ROLES.RECEPTION ||
+                           role === USER_ROLES.CLIENT,
       canViewDetails: true,
       isReception: role === USER_ROLES.RECEPTION,
       isAdmin: role === USER_ROLES.SUPER_ADMIN || role === USER_ROLES.BRANCH_ADMIN

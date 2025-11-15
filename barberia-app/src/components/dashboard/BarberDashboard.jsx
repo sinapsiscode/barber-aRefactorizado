@@ -4,11 +4,11 @@ import { useAuthStore, useStaffStore, useAppointmentStore } from '../../stores';
 import CountryFlag from '../common/CountryFlag';
 import Swal from 'sweetalert2';
 
-const BarberDashboard = () => {
+const BarberDashboard = ({ onPageChange }) => {
   const { user } = useAuthStore();
-  const { checkIn, checkOut, setTemporaryAbsence, barbers, getBarberStats } = useStaffStore();
+  const { checkIn, checkOut, setTemporaryAbsence, barbers, getBarberStats, attendance, loadStaff } = useStaffStore();
   const { appointments } = useAppointmentStore();
-  
+
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [checkInTime, setCheckInTime] = useState(null);
@@ -19,6 +19,43 @@ const BarberDashboard = () => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Cargar asistencias y verificar si ya marcó entrada hoy
+  useEffect(() => {
+    const initializeAttendance = async () => {
+      // Cargar asistencias si no están cargadas
+      if (attendance.length === 0) {
+        await loadStaff(true); // true = incluir asistencias
+      }
+
+      // Verificar si ya marcó entrada hoy
+      const today = new Date().toISOString().split('T')[0];
+      const todayAttendance = attendance.find(
+        att => {
+          const attDate = att.date || att.fecha;
+          const attCheckOut = att.checkOut || att.salida;
+          return att.barberId === user?.id &&
+                 attDate === today &&
+                 !attCheckOut; // Solo si no ha marcado salida
+        }
+      );
+
+      if (todayAttendance) {
+        setIsCheckedIn(true);
+        const checkInStr = todayAttendance.checkIn || todayAttendance.entrada;
+        if (checkInStr) {
+          const [hours, minutes, seconds] = checkInStr.split(':');
+          const checkInDate = new Date();
+          checkInDate.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds || 0));
+          setCheckInTime(checkInDate);
+        }
+      }
+    };
+
+    if (user?.id) {
+      initializeAttendance();
+    }
+  }, [user?.id, attendance.length]);
 
   // Obtener datos del barbero actual
   const currentBarber = barbers.find(b => b.id === user?.id) || {
@@ -36,16 +73,29 @@ const BarberDashboard = () => {
 
   // Calcular citas del día
   const today = new Date().toISOString().split('T')[0];
-  const todayAppointments = appointments.filter(apt => 
-    apt.barberId === user?.id && 
-    apt.date === today
-  );
+  const todayAppointments = appointments.filter(apt => {
+    const appointmentDate = apt.date || apt.fecha;
+    return apt.barberId === user?.id && appointmentDate === today;
+  });
 
-  const completedToday = todayAppointments.filter(apt => apt.status === 'completed').length;
-  const pendingToday = todayAppointments.filter(apt => apt.status === 'confirmed').length;
+  const completedToday = todayAppointments.filter(apt => {
+    const appointmentStatus = apt.status || apt.estado;
+    return appointmentStatus === 'completed';
+  }).length;
+  const pendingToday = todayAppointments.filter(apt => {
+    const appointmentStatus = apt.status || apt.estado;
+    return appointmentStatus === 'confirmed';
+  }).length;
   const nextAppointment = todayAppointments
-    .filter(apt => apt.status === 'confirmed')
-    .sort((a, b) => a.time.localeCompare(b.time))[0];
+    .filter(apt => {
+      const appointmentStatus = apt.status || apt.estado;
+      return appointmentStatus === 'confirmed';
+    })
+    .sort((a, b) => {
+      const timeA = a.time || a.hora;
+      const timeB = b.time || b.hora;
+      return (timeA || '').localeCompare(timeB || '');
+    })[0];
 
   // Calcular ingresos del día (estimado)
   const todayEarnings = completedToday * 30; // S/30 promedio por servicio
@@ -68,7 +118,16 @@ const BarberDashboard = () => {
       if (checkInResult.success) {
         setIsCheckedIn(true);
         setCheckInTime(currentTime);
+        // Recargar asistencias para actualizar el estado
+        await loadStaff(true);
         Swal.fire('¡Entrada registrada!', 'Tu hora de entrada ha sido marcada', 'success');
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: checkInResult.error || 'No se pudo registrar la entrada',
+          confirmButtonColor: '#ef4444'
+        });
       }
     }
   };
@@ -89,7 +148,17 @@ const BarberDashboard = () => {
       const checkOutResult = await checkOut(user.id);
       if (checkOutResult.success) {
         setIsCheckedIn(false);
+        setCheckInTime(null);
+        // Recargar asistencias para actualizar el estado
+        await loadStaff(true);
         Swal.fire('¡Salida registrada!', 'Tu hora de salida ha sido marcada', 'success');
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: checkOutResult.error || 'No se pudo registrar la salida',
+          confirmButtonColor: '#ef4444'
+        });
       }
     }
   };

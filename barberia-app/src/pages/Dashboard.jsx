@@ -13,13 +13,13 @@ const Dashboard = ({ onPageChange }) => {
       case 'super_admin':
         return <SuperAdminDashboard onPageChange={onPageChange} />;
       case 'branch_admin':
-        return <BranchAdminDashboard />;
+        return <BranchAdminDashboard onPageChange={onPageChange} />;
       case 'barber':
-        return <BarberDashboard />;
+        return <BarberDashboard onPageChange={onPageChange} />;
       case 'reception':
-        return <ReceptionDashboard />;
+        return <ReceptionDashboard onPageChange={onPageChange} />;
       case 'client':
-        return <ClientDashboard />;
+        return <ClientDashboard onPageChange={onPageChange} />;
       default:
         return (
           <div className="flex items-center justify-center h-64">

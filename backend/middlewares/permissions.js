@@ -60,6 +60,31 @@ function permissionsMiddleware(req, res, next) {
       console.log(`✅ [PERMS] Permiso especial: Barbero accediendo a info filtrada`);
       return next();
     }
+
+    // Barberos pueden ver asistencias
+    if (roleSlug === 'barber' && resource === 'asistencias') {
+      console.log(`✅ [PERMS] Permiso especial: Barbero accediendo a asistencias`);
+      return next();
+    }
+  }
+
+  // EXCEPCIÓN: Barberos pueden crear/editar sus propias asistencias (check-in/check-out)
+  if ((req.method === 'POST' || req.method === 'PATCH' || req.method === 'PUT') && roleSlug === 'barber' && resource === 'asistencias') {
+    // Verificar que están creando/editando su propia asistencia
+    const barberoId = req.body.barberoId || req.params.barberoId;
+
+    // En POST, el barberoId viene en el body
+    // En PATCH/PUT, podemos verificar contra la BD o confiar en requireBranchAccess
+    if (req.method === 'POST' && parseInt(barberoId) === userId) {
+      console.log(`✅ [PERMS] Permiso especial: Barbero registrando su propia asistencia`);
+      return next();
+    }
+
+    // Para PATCH/PUT, permitir (requireBranchAccess verificará ownership)
+    if (req.method === 'PATCH' || req.method === 'PUT') {
+      console.log(`✅ [PERMS] Permiso especial: Barbero actualizando asistencia`);
+      return next();
+    }
   }
 
   // Verificar permiso normal
