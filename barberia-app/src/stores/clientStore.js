@@ -73,6 +73,59 @@ const useClientStore = create(
       },
 
       /**
+       * BUSCAR CLIENTES - Search con JSON Server
+       */
+      searchClients: async (searchTerm) => {
+        set({ isLoading: true, error: null });
+        try {
+          // Si no hay término de búsqueda, cargar todos
+          if (!searchTerm || searchTerm.trim() === '') {
+            return await get().loadClients();
+          }
+
+          // Usar búsqueda full-text de JSON Server
+          const clientesBackend = await clientesApiExtended.getAll({ q: searchTerm });
+
+          // Mapear datos de español (backend) a inglés (frontend)
+          const clients = clientesBackend.map(cliente => ({
+            id: cliente.id,
+            name: cliente.nombre,
+            email: cliente.email,
+            phone: cliente.telefono,
+            birthDate: cliente.fechaNacimiento,
+            address: cliente.direccion,
+            preferredBranch: cliente.sucursalPreferida,
+            preferredBarber: cliente.barberoPreferido,
+            loyaltyPoints: cliente.puntosLealtad || 0,
+            totalVisits: cliente.totalVisitas || 0,
+            totalSpent: cliente.totalGastado || 0,
+            preferredServices: cliente.serviciosPreferidos || [],
+            notes: cliente.notas || '',
+            status: cliente.estado || 'active',
+            lastVisit: cliente.ultimaVisita,
+            createdAt: cliente.createdAt,
+            updatedAt: cliente.updatedAt,
+            // Campos adicionales de seguridad
+            isFlagged: cliente.esProblematico || false,
+            flagReason: cliente.razonProblema || '',
+            isUnwelcome: cliente.noEstaBienvenido || false,
+            blacklistReason: cliente.razonBlacklist || '',
+            // Campos de recordatorios
+            cutoffWarningInterval: cliente.intervaloAvisoCorte || 15,
+            lastWarningDate: cliente.fechaUltimoAviso || null,
+            warningEnabled: cliente.avisoHabilitado !== false
+          }));
+
+          set({ clients, isLoading: false });
+          return { success: true, count: clients.length };
+        } catch (error) {
+          console.error('Error buscando clientes:', error);
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
        * AGREGAR CLIENTE - POST a API
        */
       addClient: async (clientData) => {

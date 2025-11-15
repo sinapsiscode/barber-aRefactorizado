@@ -474,6 +474,21 @@
       "activo": true,
       "createdAt": "2024-09-17T15:38:04.587Z",
       "updatedAt": "2025-10-07T22:00:20.416Z"
+    },
+    {
+      "name": "GALVEZ",
+      "email": "asf@g.com",
+      "password": "123456",
+      "branchId": 8,
+      "phone": "987789876",
+      "status": "active",
+      "role": "branch_admin",
+      "permissions": [
+        "read",
+        "write",
+        "delete_own_branch"
+      ],
+      "id": 21
     }
   ],
   "clientes": [
@@ -1610,6 +1625,27 @@
       "createdAt": "2025-10-23T20:17:03.010Z",
       "updatedAt": "2025-10-23T20:17:03.010Z",
       "id": 52
+    },
+    {
+      "nombre": "Nami",
+      "email": "nami@gm.com",
+      "telefono": "961170923",
+      "fechaNacimiento": "2002-02-12",
+      "direccion": "sasdfoiaf",
+      "sucursalPreferida": 6,
+      "puntosLealtad": 0,
+      "totalVisitas": 0,
+      "totalGastado": 0,
+      "serviciosPreferidos": [],
+      "notas": "asfasfaf",
+      "estado": "active",
+      "ultimaVisita": null,
+      "intervaloAvisoCorte": 15,
+      "fechaUltimoAviso": null,
+      "avisoHabilitado": true,
+      "createdAt": "2025-11-14T23:40:00.142Z",
+      "updatedAt": "2025-11-14T23:40:00.142Z",
+      "id": 53
     }
   ],
   "barberos": [
@@ -1989,6 +2025,28 @@
       "createdAt": "2025-10-24T00:50:37.446Z",
       "updatedAt": "2025-10-24T00:50:37.446Z",
       "id": 17
+    },
+    {
+      "nombre": "Chopper",
+      "email": "pier@gd.com",
+      "telefono": "9873261234",
+      "sucursalId": 8,
+      "especialidades": [
+        "Corte Clásico",
+        "Diseño Especial",
+        "Tinte"
+      ],
+      "calificacion": 5,
+      "totalServicios": 0,
+      "totalGanancias": 0,
+      "presente": false,
+      "pais": "PE",
+      "estado": "active",
+      "experiencia": "23",
+      "logros": [],
+      "createdAt": "2025-11-14T23:37:50.548Z",
+      "updatedAt": "2025-11-14T23:37:50.548Z",
+      "id": 18
     }
   ],
   "sucursales": [
@@ -4443,6 +4501,23 @@
       "categoria": "Tratamientos",
       "descripcion": "Tratamiento nutritivo para el cabello",
       "popular": false
+    },
+    {
+      "nombre": "lowFade",
+      "duracion": 45,
+      "precio": 30,
+      "imagen": "data:image/jpeg;base64,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",
+      "categoria": "cortes",
+      "descripcion": "asfasfasf",
+      "caracteristicas": [],
+      "galeria": [],
+      "videoUrl": null,
+      "popular": true,
+      "descuento": null,
+      "nota": "",
+      "createdAt": "2025-11-14T23:54:55.880Z",
+      "updatedAt": "2025-11-14T23:54:55.880Z",
+      "id": 9
     }
   ],
   "transacciones": [
@@ -5626,6 +5701,20 @@
       "diasValidez": 30,
       "categoria": "service",
       "activa": true
+    },
+    {
+      "nombre": "2x1",
+      "descripcion": " toasfasfg",
+      "costoEnPuntos": 888,
+      "tipoDescuento": "fixed",
+      "valorDescuento": 23,
+      "diasValidez": 30,
+      "categoria": "vip",
+      "activo": true,
+      "usosMaximos": 1,
+      "serviciosAplicables": [],
+      "icono": "star",
+      "id": 5
     }
   ],
   "transaccionesPuntos": [],

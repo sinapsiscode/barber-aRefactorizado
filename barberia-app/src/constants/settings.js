@@ -29,7 +29,6 @@ export const BASE_TABS = [
 export const ROLE_SPECIFIC_TABS = {
   super_admin: [
     { id: 'system', name: 'Sistema', icon: FiGlobe },
-    { id: 'branches', name: 'Sedes', icon: FiMapPin },
     { id: 'admins', name: 'Administradores', icon: FiShield },
     { id: 'loyalty', name: 'Fidelización', icon: FiGift }
   ],

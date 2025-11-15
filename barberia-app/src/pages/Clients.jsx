@@ -34,6 +34,7 @@ const Clients = () => {
   const {
     clients,
     loadClients,
+    searchClients,
     getVIPClients,
     markAsUnwelcome,
     removeUnwelcomeStatus
@@ -98,6 +99,25 @@ const Clients = () => {
       loadClients();
     }
   }, [clients.length, loadClients]);
+
+  // Buscar clientes con debounce cuando cambia el término de búsqueda
+  useEffect(() => {
+    // Solo buscar si ya hay clientes cargados (evita búsqueda en mount inicial)
+    if (clients.length === 0 && !searchTerm) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      if (searchTerm && searchTerm.trim().length > 0) {
+        searchClients(searchTerm);
+      } else if (searchTerm === '' && clients.length > 0) {
+        // Si se borra el término de búsqueda, recargar todos
+        loadClients();
+      }
+    }, 500); // Debounce de 500ms
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
 
   // ==================== HANDLERS ====================
 

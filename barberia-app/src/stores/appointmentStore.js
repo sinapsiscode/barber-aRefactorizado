@@ -453,6 +453,64 @@ const useAppointmentStore = create(
        */
 
       /**
+       * CREAR SERVICIO - POST a API
+       */
+      addService: async (serviceData) => {
+        set({ isLoading: true, error: null });
+        try {
+          // Mapear datos de inglés a español
+          const servicioData = {
+            nombre: serviceData.name,
+            duracion: serviceData.duration,
+            precio: serviceData.price,
+            imagen: serviceData.image || '/default-service.png',
+            categoria: serviceData.category,
+            descripcion: serviceData.description,
+            caracteristicas: serviceData.features || [],
+            galeria: serviceData.gallery || [],
+            videoUrl: serviceData.videoUrl || null,
+            popular: serviceData.popular || false,
+            descuento: serviceData.discount || null,
+            nota: serviceData.note || '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+
+          // Crear en API
+          const servicioCreado = await serviciosApi.create(servicioData);
+
+          // Mapear respuesta de español a inglés
+          const newService = {
+            id: servicioCreado.id,
+            name: servicioCreado.nombre,
+            duration: servicioCreado.duracion,
+            price: servicioCreado.precio,
+            image: servicioCreado.imagen,
+            category: servicioCreado.categoria,
+            description: servicioCreado.descripcion,
+            features: servicioCreado.caracteristicas,
+            gallery: servicioCreado.galeria,
+            videoUrl: servicioCreado.videoUrl,
+            popular: servicioCreado.popular,
+            discount: servicioCreado.descuento,
+            note: servicioCreado.nota
+          };
+
+          // Agregar al estado local
+          set(state => ({
+            services: [...state.services, newService],
+            isLoading: false
+          }));
+
+          return { success: true, service: newService };
+        } catch (error) {
+          console.error('Error creando servicio:', error);
+          set({ isLoading: false, error: error.message });
+          return { success: false, error: error.message };
+        }
+      },
+
+      /**
        * ACTUALIZAR SERVICIO - PATCH a API
        */
       updateService: async (serviceId, updates) => {

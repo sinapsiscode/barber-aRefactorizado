@@ -2,15 +2,17 @@ import { useState, useEffect, useMemo } from 'react';
 import { FiScissors, FiClock, FiDollarSign, FiStar, FiTrendingUp, FiGift, FiUsers, FiAward, FiImage, FiPlay, FiCalendar, FiSettings, FiPlus, FiSearch, FiGrid, FiList, FiFilter, FiEdit, FiHeart, FiCheck } from 'react-icons/fi';
 import { useAuthStore, useBranchStore, useAppointmentStore } from '../stores';
 import ServiceModal from '../components/services/ServiceModal';
+import ServiceForm from '../components/services/ServiceForm';
 import ServicePricingManager from '../components/services/ServicePricingManager';
 
 const Services = () => {
   const { user } = useAuthStore();
   const { selectedBranch } = useBranchStore();
-  const { services } = useAppointmentStore();
+  const { services, addService, updateService } = useAppointmentStore();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedService, setSelectedService] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [showPricingManager, setShowPricingManager] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid');
@@ -78,12 +80,12 @@ const Services = () => {
 
   const handleAddService = () => {
     setSelectedService(null);
-    setIsModalOpen(true);
+    setIsFormOpen(true);
   };
 
   const handleEditService = (service) => {
     setSelectedService(service);
-    setIsModalOpen(true);
+    setIsFormOpen(true);
   };
 
   const handleToggleFavorite = (serviceId) => {
@@ -261,6 +263,16 @@ const Services = () => {
         </div>
         
         <div className="flex items-center space-x-4">
+          {/* Botón Nuevo Servicio */}
+          {(user?.role === 'super_admin' || user?.role === 'branch_admin') && (
+            <button
+              onClick={handleAddService}
+              className="btn-primary flex items-center"
+            >
+              <FiPlus className="h-4 w-4 mr-2" />
+              Nuevo Servicio
+            </button>
+          )}
         </div>
       </div>
 
@@ -292,8 +304,8 @@ const Services = () => {
         ))}
       </div>
 
-      {/* ServiceModal */}
-      <ServiceModal 
+      {/* ServiceModal - Solo para ver detalles */}
+      <ServiceModal
         service={selectedService}
         isOpen={isModalOpen}
         onClose={() => {
@@ -301,6 +313,17 @@ const Services = () => {
           setSelectedService(null);
         }}
         onBookService={handleBookService}
+      />
+
+      {/* ServiceForm - Para crear/editar */}
+      <ServiceForm
+        service={selectedService}
+        isOpen={isFormOpen}
+        onClose={() => {
+          setIsFormOpen(false);
+          setSelectedService(null);
+        }}
+        onSave={selectedService ? updateService : addService}
       />
 
       {/* Pricing Manager Modal */}

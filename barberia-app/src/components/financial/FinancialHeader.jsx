@@ -4,7 +4,7 @@ import { FINANCIAL_TEXTS } from '../../constants/financial';
 /**
  * Header de la página financiera con botones de acción
  */
-const FinancialHeader = ({ title, subtitle, showCharts, onToggleCharts, onNewTransaction }) => {
+const FinancialHeader = ({ title, subtitle, showCharts, onToggleCharts, onNewTransaction, onExportPDF }) => {
   return (
     <div className="flex items-center justify-between">
       <div>
@@ -23,7 +23,10 @@ const FinancialHeader = ({ title, subtitle, showCharts, onToggleCharts, onNewTra
           <FiBarChart className="h-4 w-4 mr-2" />
           {showCharts ? FINANCIAL_TEXTS.hideChartsButton : FINANCIAL_TEXTS.showChartsButton}
         </button>
-        <button className="btn-secondary">
+        <button
+          onClick={onExportPDF}
+          className="btn-secondary"
+        >
           <FiDownload className="h-4 w-4 mr-2" />
           {FINANCIAL_TEXTS.exportButton}
         </button>

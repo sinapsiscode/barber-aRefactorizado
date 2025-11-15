@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useFinancialStore, useBranchStore } from '../stores';
+import { useFinancialStore, useBranchStore, useAuthStore } from '../stores';
 import BranchRestrictionNotice from '../components/common/BranchRestrictionNotice';
 import TransactionForm from '../components/financial/TransactionForm';
 import FinancialCharts from '../components/financial/FinancialCharts';
+import FinancialReportPDF from '../components/financial/FinancialReportPDF';
 import useBranchFilter from '../hooks/useBranchFilter';
 import { useFinancialMetrics } from '../hooks/financial/useFinancialMetrics';
 import { useVoucherModal } from '../hooks/financial/useVoucherModal';
 import { FINANCIAL_TEXTS } from '../constants/financial';
+import { pdf } from '@react-pdf/renderer';
+import Swal from 'sweetalert2';
 
 // Componentes modulares
 import FinancialHeader from '../components/financial/FinancialHeader';
@@ -78,6 +81,63 @@ const Financial = () => {
     closeVoucherModal
   } = useVoucherModal();
 
+  // Función para exportar transacciones a PDF
+  const handleExportPDF = async () => {
+    try {
+      // Mostrar loading
+      Swal.fire({
+        title: 'Generando PDF...',
+        text: 'Por favor espera',
+        allowOuterClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Obtener nombre de la sucursal si existe
+      const { selectedBranch } = useBranchStore.getState();
+      const branchName = selectedBranch?.name || selectedBranch?.nombre || 'Todas las Sucursales';
+
+      // Generar el documento PDF
+      const blob = await pdf(
+        <FinancialReportPDF
+          transactions={filteredTransactions}
+          summary={summary}
+          categories={categories}
+          paymentMethods={paymentMethods}
+          branchName={branchName}
+        />
+      ).toBlob();
+
+      // Crear URL y descargar
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `reporte_financiero_${new Date().toISOString().split('T')[0]}.pdf`;
+      link.click();
+
+      // Limpiar
+      URL.revokeObjectURL(url);
+
+      // Mostrar éxito
+      Swal.fire({
+        icon: 'success',
+        title: 'PDF Generado',
+        text: 'El reporte se ha descargado exitosamente',
+        confirmButtonColor: '#ffc000',
+        timer: 2000
+      });
+    } catch (error) {
+      console.error('Error exportando PDF:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo generar el PDF. Por favor intenta de nuevo.',
+        confirmButtonColor: '#ffc000'
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <BranchRestrictionNotice />
@@ -89,6 +149,7 @@ const Financial = () => {
         showCharts={showCharts}
         onToggleCharts={() => setShowCharts(!showCharts)}
         onNewTransaction={() => setShowForm(true)}
+        onExportPDF={handleExportPDF}
       />
 
       {/* Métricas principales */}
