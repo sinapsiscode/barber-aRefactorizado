@@ -170,28 +170,44 @@ function requireBranchAccess(req, res, next) {
       const pathParts = req.path.split('/').filter(p => p);
       const resource = pathParts[0];
 
+      // Buscar el email del usuario y el cliente correspondiente
+      const db = loadDatabase();
+      const user = db.usuarios.find(u => u.id === parseInt(userId));
+      let clienteId = null;
+
+      if (user && user.email) {
+        // Buscar el cliente con este email
+        const cliente = db.clientes.find(c => c.email === user.email);
+        if (cliente) {
+          clienteId = cliente.id;
+          console.log(`🔍 [AUTH] Cliente encontrado: ID=${clienteId}, Email=${user.email}`);
+        }
+      }
+
       // Para clientes, filtrar solo su propia información por email
       if (resource === 'clientes') {
-        // Buscar el email del usuario en la BD
-        const db = loadDatabase();
-        const user = db.usuarios.find(u => u.id === parseInt(userId));
         if (user && user.email) {
           req.query.email = user.email;
           console.log(`🔍 [AUTH] Filtrando clientes por email: ${user.email}`);
         }
       }
-      // Para citas, filtrar por clientId
-      if (resource === 'citas') {
-        req.query.clientId = userId;
+      // El filtrado se hace en router.render en lugar de aquí
+      // porque JSON Server no respeta los req.query modificados después del parseo
+      /*
+      // Para citas, filtrar por clienteId correcto (no userId)
+      if (resource === 'citas' && clienteId) {
+        req.query.clienteId = clienteId;
+        console.log(`🔍 [AUTH] Filtrando citas por clienteId: ${clienteId}`);
       }
       // Para recompensas de cliente
-      if (resource === 'recompensasCliente') {
-        req.query.clientId = userId;
+      if (resource === 'recompensasCliente' && clienteId) {
+        req.query.clientId = clienteId;
       }
       // Para transacciones de puntos
-      if (resource === 'transaccionesPuntos') {
-        req.query.clientId = userId;
+      if (resource === 'transaccionesPuntos' && clienteId) {
+        req.query.clientId = clienteId;
       }
+      */
     }
   }
 

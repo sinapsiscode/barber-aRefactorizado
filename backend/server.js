@@ -368,6 +368,58 @@ server.use(requireBranchAccess);
 // ROUTER DE JSON-SERVER
 // ============================================
 
+// Middleware para filtrar resultados basados en req.auth
+router.render = (req, res) => {
+  const { roleSlug, userId } = req.auth || {};
+
+  // Si es cliente, filtrar resultados
+  if (roleSlug === 'client' && userId && req.method === 'GET') {
+    const db = router.db;
+    const user = db.get('usuarios').find({ id: parseInt(userId) }).value();
+
+    if (user && user.email) {
+      const cliente = db.get('clientes').find({ email: user.email }).value();
+
+      if (cliente) {
+        const pathParts = req.path.split('/').filter(p => p);
+        const resource = pathParts[0];
+
+        // Filtrar citas
+        if (resource === 'citas' && Array.isArray(res.locals.data)) {
+          const totalBefore = res.locals.data.length;
+          console.log(`🔍 [RENDER] Citas antes de filtrar: ${totalBefore}`);
+          res.locals.data = res.locals.data.filter(cita =>
+            parseInt(cita.clienteId) === parseInt(cliente.id)
+          );
+          console.log(`🔍 [RENDER] Filtradas ${res.locals.data.length}/${totalBefore} citas para clienteId: ${cliente.id}`);
+        }
+
+        // Filtrar clientes
+        if (resource === 'clientes' && Array.isArray(res.locals.data)) {
+          res.locals.data = res.locals.data.filter(c => c.email === user.email);
+          console.log(`🔍 [RENDER] Filtrado cliente por email: ${user.email}`);
+        }
+
+        // Filtrar recompensas de cliente
+        if (resource === 'recompensasCliente' && Array.isArray(res.locals.data)) {
+          res.locals.data = res.locals.data.filter(r =>
+            parseInt(r.clientId) === parseInt(cliente.id)
+          );
+        }
+
+        // Filtrar transacciones de puntos
+        if (resource === 'transaccionesPuntos' && Array.isArray(res.locals.data)) {
+          res.locals.data = res.locals.data.filter(t =>
+            parseInt(t.clientId) === parseInt(cliente.id)
+          );
+        }
+      }
+    }
+  }
+
+  res.json(res.locals.data);
+};
+
 // Usar el router de json-server (esto maneja GET, POST, PUT, PATCH, DELETE)
 server.use(router);
 

@@ -4607,6 +4607,26 @@
       "notas": "Reserva online",
       "recordatorioEnviado": false,
       "id": 114
+    },
+    {
+      "clienteId": 51,
+      "nombreCliente": "Juan Cliente",
+      "barberoId": 17,
+      "nombreBarbero": "GIANPIERRRRRRRRRE",
+      "sucursalId": 6,
+      "fecha": "2025-11-16",
+      "hora": "11:00",
+      "servicios": [
+        6
+      ],
+      "precioTotal": 70,
+      "duracion": 90,
+      "estado": "confirmed",
+      "notas": "",
+      "recordatorioEnviado": false,
+      "createdAt": "2025-11-15T01:13:31.241Z",
+      "updatedAt": "2025-11-15T01:13:31.241Z",
+      "id": 115
     }
   ],
   "servicios": [
